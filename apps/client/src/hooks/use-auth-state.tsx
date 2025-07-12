@@ -1,4 +1,14 @@
+import { useState, useEffect } from "react";
+
 export const useAuthState = () => {
-  const isAuthenticated = document.cookie.includes("isAuthenticated");
-  return { isLoggedIn: isAuthenticated };
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isAuthenticated = document.cookie.includes("isAuthenticated=true");
+      setIsLoggedIn(isAuthenticated);
+    }
+  }, []);
+
+  return { isLoggedIn };
 };
