@@ -19,10 +19,8 @@
     "prepare": "husky"
   },
   "workspaces": [
-    "client",
-    "server",
-    "sdk",
-    "docs"
+    "apps/*",
+    "packages/*"
   ],
   "devDependencies": {
     "husky": "^9.1.7"
