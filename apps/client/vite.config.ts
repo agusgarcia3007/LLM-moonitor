@@ -11,12 +11,31 @@ export default defineConfig({
       target: "react",
       autoCodeSplitting: true,
     }),
-    react(),
+    react({
+      // Configuración específica para React 19
+      jsxImportSource: "react",
+    }),
     tailwindcss(),
   ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  build: {
+    // Configuración específica para React 19
+    target: "esnext",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "react-vendor": ["react", "react-dom"],
+          "router-vendor": ["@tanstack/react-router"],
+          "chart-vendor": ["recharts"],
+        },
+      },
+    },
+  },
+  optimizeDeps: {
+    include: ["react", "react-dom", "@tanstack/react-router"],
   },
 });

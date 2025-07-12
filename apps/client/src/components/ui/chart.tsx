@@ -44,12 +44,8 @@ function ChartContainer({
     typeof RechartsPrimitive.ResponsiveContainer
   >["children"];
 }) {
-  // Use a more stable ID generation method
-  const uniqueId = React.useMemo(() => {
-    return Math.random().toString(36).substr(2, 9);
-  }, []);
-
-  const chartId = `chart-${id || uniqueId}`;
+  const uniqueId = React.useId();
+  const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
 
   return (
     <ChartContext.Provider value={{ config }}>

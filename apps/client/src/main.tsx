@@ -22,12 +22,18 @@ declare module "@tanstack/react-router" {
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <StrictMode>
-      <Providers>
-        <RouterProvider router={router} />
-        {/* <Analytics /> */}
-      </Providers>
-    </StrictMode>
-  );
+
+  // Add error boundary for React 19
+  const App = () => {
+    return (
+      <StrictMode>
+        <Providers>
+          <RouterProvider router={router} />
+          {/* <Analytics /> */}
+        </Providers>
+      </StrictMode>
+    );
+  };
+
+  root.render(<App />);
 }
