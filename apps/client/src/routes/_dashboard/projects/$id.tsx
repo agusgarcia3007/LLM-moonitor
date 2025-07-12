@@ -10,7 +10,7 @@ import {
   IconTrash,
   IconUserPlus,
   IconUsers,
-  IconX
+  IconX,
 } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
@@ -28,7 +28,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -73,7 +73,7 @@ import { toast } from "sonner";
 const inviteFormSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
   role: z.enum(["member", "admin", "owner"], {
-    required_error: "Role is required",
+    message: "Role is required",
   }),
 });
 
@@ -333,7 +333,11 @@ function ProjectDetailsPage() {
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                          >
                             <IconDots className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
