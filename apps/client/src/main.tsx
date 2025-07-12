@@ -1,12 +1,17 @@
 import "@/i18n";
-import { StrictMode } from "react";
+import React, { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import "./index.css";
-// import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/react";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
 import { Providers } from "./components/providers";
+
+// Ensure React is available globally for TanStack Router
+if (typeof window !== "undefined") {
+  (globalThis as typeof globalThis & { React: typeof React }).React = React;
+}
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -29,7 +34,7 @@ if (!rootElement.innerHTML) {
       <StrictMode>
         <Providers>
           <RouterProvider router={router} />
-          {/* <Analytics /> */}
+          <Analytics />
         </Providers>
       </StrictMode>
     );
