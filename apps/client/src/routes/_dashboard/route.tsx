@@ -2,7 +2,10 @@ import { DashboardLayout } from "@/components/layout/dashboard";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 function isAuthenticated() {
-  return document.cookie.includes("isAuthenticated=true");
+  return (
+    typeof document !== "undefined" &&
+    document.cookie.includes("isAuthenticated=true")
+  );
 }
 
 export const Route = createFileRoute("/_dashboard")({
