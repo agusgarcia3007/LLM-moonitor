@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
+import { authClient } from "@/lib/auth-client";
 import {
   Sidebar,
   SidebarContent,
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: session, isPending } = authClient.useSession();
   const { open } = useSidebar();
 
   return (
@@ -43,7 +45,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <div className="p-4">Basic Content</div>
       </SidebarContent>
       <SidebarFooter>
-        <div className="p-4 text-xs text-muted-foreground">Basic Footer</div>
+        <div className="p-4 text-xs text-muted-foreground">
+          {isPending
+            ? "Loading..."
+            : session?.user
+            ? `User: ${session.user.email}`
+            : "Not signed in"}
+        </div>
       </SidebarFooter>
     </Sidebar>
   );
