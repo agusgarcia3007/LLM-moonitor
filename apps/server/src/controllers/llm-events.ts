@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { LogLlmEventSchema } from "../schemas/llm-events";
 import { db } from "@/db";
-import { llm_event, type LLMEventMetadata } from "@/db/schema";
+import { llm_event, global_stats, type LLMEventMetadata } from "@/db/schema";
 import {
   parseQueryParams,
   createSortHelpers,
@@ -97,6 +97,14 @@ export const logEvent = async (c: Context) => {
     organization_id: organizationId,
     metadata,
   });
+
+  await db
+    .update(global_stats)
+    .set({
+      total_events: sql`total_events + 1`,
+      updated_at: new Date(),
+    })
+    .where(sql`id = 1`);
 
   return c.json({
     success: true,

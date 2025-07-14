@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { db } from "@/db";
-import { llm_event } from "@/db/schema";
+import { llm_event, global_stats } from "@/db/schema";
 import { eq, sql, gte, desc, and, count } from "drizzle-orm";
 
 export const getDashboardStats = async (c: Context) => {
@@ -195,12 +195,12 @@ export const getCostAnalysis = async (c: Context) => {
 };
 
 export const getGlobalStats = async (c: Context) => {
-  const totalEvents = await db.select({ count: count() }).from(llm_event);
+  const stats = await db.select().from(global_stats).limit(1);
 
   return c.json({
     success: true,
     data: {
-      totalEvents: Number(totalEvents[0]?.count || 0),
+      totalEvents: stats[0]?.total_events || 0,
     },
   });
 };

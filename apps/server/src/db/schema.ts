@@ -266,3 +266,11 @@ export const subscription = pgTable("subscription", {
   trialStart: timestamp("trial_start"),
   trialEnd: timestamp("trial_end"),
 });
+
+export const global_stats = pgTable("global_stats", {
+  id: serial("id").primaryKey(),
+  total_events: integer("total_events").notNull().default(0),
+  updated_at: timestamp("updated_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
