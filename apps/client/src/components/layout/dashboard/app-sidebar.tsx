@@ -13,10 +13,7 @@ import * as React from "react";
 
 import { NavMain } from "@/components/layout/dashboard/nav-main";
 import { NavSecondary } from "@/components/layout/dashboard/nav-secondary";
-import {
-  NavUser,
-  NavUserSkeleton,
-} from "@/components/layout/dashboard/nav-user";
+import { NavUser } from "@/components/layout/dashboard/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -137,7 +134,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         {isPending ? (
-          <NavUserSkeleton />
+          <div className="p-4 text-xs text-muted-foreground">
+            Loading User...
+          </div>
         ) : user ? (
           <NavUser user={user} />
         ) : (

@@ -56,16 +56,15 @@ function Login({ className, ...props }: React.ComponentProps<"form">) {
             Date.now() + 24 * 60 * 60 * 1000
           ).toUTCString();
           document.cookie = `isAuthenticated=true; expires=${expires}; path=/;`;
-          // const { data: subscriptions } = await authClient.subscription.list();
-          // const activeSubscription = subscriptions?.find(
-          //   (sub) => sub.status === "active" || sub.status === "trialing"
-          // );
+          const { data: subscriptions } = await authClient.subscription.list();
+          const activeSubscription = subscriptions?.find(
+            (sub) => sub.status === "active" || sub.status === "trialing"
+          );
 
-          // navigate({
-          //   to: activeSubscription ? "/dashboard" : "/pricing",
-          //   search: activeSubscription ? { period: "1" } : undefined,
-          // });
-          navigate({ to: "/dashboard", search: { period: "1" } });
+          navigate({
+            to: activeSubscription ? "/dashboard" : "/pricing",
+            search: activeSubscription ? { period: "1" } : undefined,
+          });
         },
       }
     );
