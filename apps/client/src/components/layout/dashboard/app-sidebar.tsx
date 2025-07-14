@@ -13,7 +13,10 @@ import * as React from "react";
 
 import { NavMain } from "@/components/layout/dashboard/nav-main";
 import { NavSecondary } from "@/components/layout/dashboard/nav-secondary";
-import { NavUser } from "@/components/layout/dashboard/nav-user";
+import {
+  NavUser,
+  NavUserSkeleton,
+} from "@/components/layout/dashboard/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -24,13 +27,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useGetSession } from "@/services/session/query";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session, isPending, error } = useGetSession();
   const { open } = useSidebar();
   const { t } = useTranslation();
 
@@ -41,6 +44,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         avatar: session.user.image || "",
       }
     : null;
+
+  console.log({ session, isPending, error, user });
 
   const data = {
     navMain: [
@@ -134,9 +139,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         {isPending ? (
-          <div className="p-4 text-xs text-muted-foreground">
-            Loading User...
-          </div>
+          <NavUserSkeleton />
         ) : user ? (
           <NavUser user={user} />
         ) : (
