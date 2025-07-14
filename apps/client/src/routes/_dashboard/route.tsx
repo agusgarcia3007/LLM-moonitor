@@ -1,11 +1,11 @@
 import { DashboardLayout } from "@/components/layout/dashboard";
-import { hasSubscription } from "@/lib/cookies";
+import { hasSubscription, getCookie } from "@/lib/cookies";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 function isAuthenticated() {
   return (
     typeof document !== "undefined" &&
-    document.cookie.includes("isAuthenticated=true")
+    getCookie("isAuthenticated") === "true"
   );
 }
 

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { logout } from "./auth";
+import { clearSubscriptionCookie } from "./cookies";
 
 export const http = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -19,6 +20,7 @@ http.interceptors.response.use(
       });
     }
     if (error.response?.status === 402) {
+      clearSubscriptionCookie();
       window.location.href = "/pricing";
     }
     // 402 = Payment Required -> subscription issue, don't logout

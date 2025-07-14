@@ -53,21 +53,29 @@ function Login({ className, ...props }: React.ComponentProps<"form">) {
           setLoading(true);
         },
         onSuccess: async () => {
-          const expires = new Date(
-            Date.now() + 24 * 60 * 60 * 1000
-          ).toUTCString();
-          document.cookie = `isAuthenticated=true; expires=${expires}; path=/;`;
-          const { data: subscriptions } = await authClient.subscription.list();
-          const activeSubscription = subscriptions?.find(
-            (sub) => sub.status === "active" || sub.status === "trialing"
-          );
+          try {
+            const expires = new Date(
+              Date.now() + 24 * 60 * 60 * 1000
+            ).toUTCString();
+            document.cookie = `isAuthenticated=true; expires=${expires}; path=/;`;
+            
+            const { data: subscriptions } = await authClient.subscription.list();
+            const activeSubscription = subscriptions?.find(
+              (sub) => sub.status === "active" || sub.status === "trialing"
+            );
 
-          setHasSubscription(!!activeSubscription);
+            setHasSubscription(!!activeSubscription);
 
-          navigate({
-            to: activeSubscription ? "/dashboard" : "/pricing",
-            search: activeSubscription ? { period: "1" } : undefined,
-          });
+            navigate({
+              to: activeSubscription ? "/dashboard" : "/pricing",
+              search: activeSubscription ? { period: "1" } : undefined,
+            });
+          } catch (error) {
+            console.error("Error checking subscription:", error);
+            // Still allow login but redirect to pricing if subscription check fails
+            setHasSubscription(false);
+            navigate({ to: "/pricing" });
+          }
         },
       }
     );
