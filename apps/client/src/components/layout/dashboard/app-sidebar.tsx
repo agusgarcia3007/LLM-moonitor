@@ -13,10 +13,10 @@ import * as React from "react";
 
 import { NavMain } from "@/components/layout/dashboard/nav-main";
 import { NavSecondary } from "@/components/layout/dashboard/nav-secondary";
-import {
-  NavUser,
-  NavUserSkeleton,
-} from "@/components/layout/dashboard/nav-user";
+// import {
+//   NavUser,
+//   NavUserSkeleton,
+// } from "@/components/layout/dashboard/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -34,7 +34,6 @@ import { useTranslation } from "react-i18next";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session, isPending, error } = authClient.useSession();
-  console.log({ session, isPending, error });
   const { open } = useSidebar();
   const { t } = useTranslation();
 
@@ -45,6 +44,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         avatar: session.user.image || "",
       }
     : null;
+
+  console.log({ session, isPending, error, user });
 
   const data = {
     navMain: [
@@ -137,13 +138,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        {isPending ? (
+        {/* {isPending ? (
           <NavUserSkeleton />
         ) : user ? (
           <NavUser user={user} />
         ) : (
           <div className="p-4 text-xs text-muted-foreground">Not signed in</div>
-        )}
+        )} */}
       </SidebarFooter>
     </Sidebar>
   );
