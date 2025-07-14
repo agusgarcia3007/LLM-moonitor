@@ -7,7 +7,7 @@ import {
   IconFlask,
   IconHelp,
   IconKey,
-  IconUsers,
+  // IconUsers,
 } from "@tabler/icons-react";
 import * as React from "react";
 
@@ -27,25 +27,25 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
+// import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session, isPending, error } = authClient.useSession();
+  // const { data: session, isPending, error } = authClient.useSession();
   const { open } = useSidebar();
   const { t } = useTranslation();
 
-  const user = session?.user
-    ? {
-        name: session.user.name || session.user.email,
-        email: session.user.email,
-        avatar: session.user.image || "",
-      }
-    : null;
+  // const user = session?.user
+  //   ? {
+  //       name: session.user.name || session.user.email,
+  //       email: session.user.email,
+  //       avatar: session.user.image || "",
+  //     }
+  //   : null;
 
-  console.log({ session, isPending, error, user });
+  // console.log({ session, isPending, error, user });
 
   const data = {
     navMain: [
@@ -122,7 +122,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        {session?.user?.role === "admin" && (
+        {/* {session?.user?.role === "admin" && (
           <SidebarMenu className="mt-4">
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
@@ -133,7 +133,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
-        )}
+        )} */}
 
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
