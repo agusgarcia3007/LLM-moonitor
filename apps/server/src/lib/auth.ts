@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { stripe } from "@better-auth/stripe";
-import { betterAuth, BetterAuthOptions } from "better-auth";
+import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, apiKey, organization } from "better-auth/plugins";
 import { randomUUID } from "crypto";
@@ -9,13 +9,14 @@ import { eq } from "drizzle-orm";
 import Stripe from "stripe";
 import { siteData, TRUSTED_ORIGINS } from "./constants";
 import { EmailService } from "./email-service";
-import { getActiveOrganization, getActiveSubscription } from "./utils";
+import { getActiveOrganization } from "./utils";
 
 const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-06-30.basil",
 });
 
-const options = {
+const emailService = new EmailService();
+export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg", // or "mysql", "sqlite"
     schema,
@@ -215,7 +216,4 @@ const options = {
       },
     },
   },
-} satisfies BetterAuthOptions;
-
-const emailService = new EmailService();
-export const auth = betterAuth(options);
+});
