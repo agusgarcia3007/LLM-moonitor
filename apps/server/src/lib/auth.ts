@@ -218,6 +218,4 @@ const options = {
 } satisfies BetterAuthOptions;
 
 const emailService = new EmailService();
-export const auth = betterAuth({
-  ...options,
-});
+export const auth = betterAuth(options);
