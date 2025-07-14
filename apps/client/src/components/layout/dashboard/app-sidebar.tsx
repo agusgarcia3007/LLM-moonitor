@@ -14,8 +14,30 @@ import {
 } from "@/components/ui/sidebar";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session, isPending } = authClient.useSession();
   const { open } = useSidebar();
+
+  // Use getSession instead of useSession hook
+  const [session, setSession] = React.useState<{
+    user?: { email: string; name?: string };
+  } | null>(null);
+  const [isPending, setIsPending] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const sessionData = await authClient.getSession();
+        // @ts-expect-error - temporary fix for session type mismatch
+        setSession(sessionData);
+      } catch (error) {
+        console.error("Error fetching session:", error);
+        setSession(null);
+      } finally {
+        setIsPending(false);
+      }
+    };
+
+    fetchSession();
+  }, []);
 
   return (
     <Sidebar {...props}>

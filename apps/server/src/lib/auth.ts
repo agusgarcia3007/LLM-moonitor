@@ -147,14 +147,14 @@ export const auth = betterAuth({
             },
             freeTrial: { days: 14 },
           },
-          // Enterprise is “contact-sales”, so no priceId here
+          // Enterprise is "contact-sales", so no priceId here
         ],
 
         onSubscriptionComplete: async ({ stripeSubscription }) => {
           await stripeClient.subscriptionItems.create({
             subscription: stripeSubscription.id,
             price: "price_1Rjl2dBvY3hUsoTtgGFrUViN", // add-on metered (0.00002 USD/event)
-            quantity: 0, // evita enviar “quantity: 1”
+            quantity: 0, // evita enviar "quantity: 1"
           });
         },
       },
@@ -165,7 +165,9 @@ export const auth = betterAuth({
     session: {
       create: {
         before: async (session) => {
-          const organization = await getActiveOrganization(session.userId);
+          const [organization] = await Promise.all([
+            getActiveOrganization(session.userId),
+          ]);
 
           return {
             data: {
