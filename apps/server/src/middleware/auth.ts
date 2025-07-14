@@ -19,8 +19,9 @@ export const sessionMiddleware = async (c: Context, next: Next) => {
 
   const enrichedSession = {
     ...session.session,
+    // Priorizar session.activeOrganizationId sobre el lookup de DB
     activeOrganizationId:
-      organization?.id ?? session.session.activeOrganizationId,
+      session.session.activeOrganizationId ?? organization?.id ?? null,
     subscriptionPlan: sub?.plan ?? null,
     subscriptionStatus: sub?.status ?? null,
     subscriptionPeriodEnd: sub?.periodEnd ? sub.periodEnd.toISOString() : null,
