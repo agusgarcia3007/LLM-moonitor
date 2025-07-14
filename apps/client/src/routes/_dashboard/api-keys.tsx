@@ -41,7 +41,7 @@ export const Route = createFileRoute("/_dashboard/api-keys")({
 });
 
 const formSchema = z.object({
-  keyName: z.string().min(1, { message: "apiKeys.input.placeholder" }),
+  keyName: z.string().min(1, { message: "apiKeys.error.enterName" }),
 });
 
 function ApiKeysPage() {
