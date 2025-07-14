@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 import Stripe from "stripe";
 import { siteData, TRUSTED_ORIGINS } from "./constants";
 import { EmailService } from "./email-service";
-import { getActiveOrganization } from "./utils";
+import { getActiveOrganization, getActiveSubscription } from "./utils";
 
 const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-06-30.basil",
@@ -165,14 +165,20 @@ export const auth = betterAuth({
     session: {
       create: {
         before: async (session) => {
-          const [organization] = await Promise.all([
+          const [organization, sub] = await Promise.all([
             getActiveOrganization(session.userId),
+            getActiveSubscription(session.userId),
           ]);
 
           return {
             data: {
               ...session,
               activeOrganizationId: organization?.id ?? null,
+              subscriptionPlan: sub?.plan ?? null,
+              subscriptionStatus: sub?.status ?? null,
+              subscriptionPeriodEnd: sub?.periodEnd
+                ? sub.periodEnd.toISOString()
+                : null,
             },
           };
         },

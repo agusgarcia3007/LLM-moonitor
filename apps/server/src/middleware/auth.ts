@@ -1,5 +1,4 @@
 import { auth } from "@/lib/auth";
-import { getActiveOrganization, getActiveSubscription } from "@/lib/utils";
 import { Context, Next } from "hono";
 
 export const sessionMiddleware = async (c: Context, next: Next) => {
@@ -11,24 +10,8 @@ export const sessionMiddleware = async (c: Context, next: Next) => {
     return next();
   }
 
-  // Enrich session with subscription data
-  const [organization, sub] = await Promise.all([
-    getActiveOrganization(session.user.id),
-    getActiveSubscription(session.user.id),
-  ]);
-
-  const enrichedSession = {
-    ...session.session,
-    // Priorizar session.activeOrganizationId sobre el lookup de DB
-    activeOrganizationId:
-      session.session.activeOrganizationId ?? organization?.id ?? null,
-    subscriptionPlan: sub?.plan ?? null,
-    subscriptionStatus: sub?.status ?? null,
-    subscriptionPeriodEnd: sub?.periodEnd ? sub.periodEnd.toISOString() : null,
-  };
-
   c.set("user", session.user);
-  c.set("session", enrichedSession);
+  c.set("session", session.session); // Simple, directo, como better-auth lo diseñó
   return next();
 };
 

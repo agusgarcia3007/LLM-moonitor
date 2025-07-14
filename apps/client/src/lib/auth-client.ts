@@ -2,6 +2,7 @@ import { stripeClient } from "@better-auth/stripe/client";
 import {
   adminClient,
   apiKeyClient,
+  inferAdditionalFields,
   organizationClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
@@ -15,6 +16,14 @@ export const authClient = createAuthClient({
     apiKeyClient(),
     stripeClient({
       subscription: true,
+    }),
+    inferAdditionalFields({
+      session: {
+        activeOrganizationId: { type: "string", required: false },
+        subscriptionPlan: { type: "string", required: false },
+        subscriptionStatus: { type: "string", required: false },
+        subscriptionPeriodEnd: { type: "string", required: false },
+      },
     }),
   ],
   fetchOptions: {
