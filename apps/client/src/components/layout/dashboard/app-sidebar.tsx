@@ -1,22 +1,6 @@
-import {
-  IconBell,
-  IconBriefcase,
-  IconCurrency,
-  IconDashboard,
-  IconFileDescription,
-  IconFlask,
-  IconHelp,
-  IconKey,
-  IconUsers,
-} from "@tabler/icons-react";
 import * as React from "react";
-
-import { NavMain } from "@/components/layout/dashboard/nav-main";
-import { NavSecondary } from "@/components/layout/dashboard/nav-secondary";
-import {
-  NavUser,
-  NavUserSkeleton,
-} from "@/components/layout/dashboard/nav-user";
+import { cn } from "@/lib/utils";
+import { Link } from "@tanstack/react-router";
 import {
   Sidebar,
   SidebarContent,
@@ -27,75 +11,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
-import { cn } from "@/lib/utils";
-import { Link } from "@tanstack/react-router";
-import { useTranslation } from "react-i18next";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session, isPending } = authClient.useSession();
   const { open } = useSidebar();
-  const { t } = useTranslation();
-
-  const user = session?.user
-    ? {
-        name: session.user.name || session.user.email,
-        email: session.user.email,
-        avatar: session.user.image || "",
-      }
-    : null;
-
-  const data = {
-    navMain: [
-      {
-        title: t("navigation.dashboard"),
-        url: "/dashboard",
-        icon: IconDashboard,
-      },
-      {
-        title: t("navigation.projects"),
-        url: "/projects",
-        icon: IconBriefcase,
-      },
-      {
-        title: t("navigation.logs"),
-        url: "/logs",
-        icon: IconFileDescription,
-      },
-      {
-        title: t("navigation.apiKeys"),
-        url: "/api-keys",
-        icon: IconKey,
-      },
-      {
-        title: t("navigation.costAnalysis"),
-        url: "/cost-analysis",
-        icon: IconCurrency,
-      },
-      {
-        title: t("navigation.alerts"),
-        url: "/alerts",
-        icon: IconBell,
-      },
-      {
-        title: t("navigation.experiments"),
-        url: "/experiments",
-        icon: IconFlask,
-        isComingSoon: true,
-      },
-    ],
-    navSecondary: [
-      {
-        title: t("navigation.documentation"),
-        url: "https://docs.llmonitor.io",
-        icon: IconHelp,
-        external: true,
-      },
-    ],
-  };
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -119,30 +40,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        {session?.user?.role === "admin" && (
-          <SidebarMenu className="mt-4">
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link to="/users">
-                  <IconUsers className="mr-2" />
-                  <span>{t("navigation.users")}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        )}
-
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <div className="p-4">Basic Content</div>
       </SidebarContent>
       <SidebarFooter>
-        {isPending ? (
-          <NavUserSkeleton />
-        ) : user ? (
-          <NavUser user={user} />
-        ) : (
-          <div className="p-4 text-xs text-muted-foreground">Not signed in</div>
-        )}
+        <div className="p-4 text-xs text-muted-foreground">Basic Footer</div>
       </SidebarFooter>
     </Sidebar>
   );
