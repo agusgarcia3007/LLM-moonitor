@@ -1,4 +1,5 @@
 import { authClient } from "@/lib/auth-client";
+import { http } from "@/lib/http";
 import type {
   Subscription,
   SubscriptionLimits,
@@ -8,9 +9,7 @@ import type {
 } from "@/types/subscriptions";
 
 export class SubscriptionService {
-  public static async getSubscriptions(
-    referenceId?: string
-  ): Promise<Subscription[]> {
+  public static async getSubscriptions(referenceId?: string) {
     const { data, error } = await authClient.subscription.list({
       query: { ...(referenceId && { referenceId }) },
     });
@@ -102,5 +101,12 @@ export class SubscriptionService {
     if (typeof limit !== "number") return false;
 
     return currentUsage >= limit;
+  }
+
+  public static async createPortalSession(returnUrl?: string) {
+    const response = await http.post("/stripe/portal", {
+      returnUrl,
+    });
+    return response.data;
   }
 }

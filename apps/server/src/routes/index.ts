@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { alertsRouter } from "./alerts";
 import { analyticsRouter } from "./analytics";
 import { llmEventsRouter } from "./llm-events";
+import { stripeRouter } from "./stripe";
 
 interface RouteObject {
   path: string;
@@ -21,5 +22,9 @@ export const ROUTES: RouteObject[] = [
   {
     path: "/alerts",
     handler: alertsRouter,
+  },
+  {
+    path: "/stripe",
+    handler: stripeRouter,
   },
 ];

@@ -33,7 +33,7 @@ import { useTranslation } from "react-i18next";
 import { useGetSession } from "@/services/session/query";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session, isPending, error } = useGetSession();
+  const { data: session, isPending } = useGetSession();
   const { open } = useSidebar();
   const { t } = useTranslation();
 
@@ -44,8 +44,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         avatar: session.user.image || "",
       }
     : null;
-
-  console.log({ session, isPending, error, user });
 
   const data = {
     navMain: [

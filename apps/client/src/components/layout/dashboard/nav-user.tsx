@@ -27,7 +27,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { authClient } from "@/lib/auth-client";
+import { logout } from "@/lib/auth";
+import { SubscriptionService } from "@/services/subscriptions/service";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
@@ -62,15 +63,18 @@ export function NavUser({
   const { t, i18n } = useTranslation();
 
   const handleLogout = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          document.cookie =
-            "isAuthenticated=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-          navigate({ to: "/login" });
-        },
-      },
+    await logout(() => {
+      navigate({ to: "/login" });
     });
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      const { url } = await SubscriptionService.createPortalSession();
+      navigate({ href: url });
+    } catch (error) {
+      console.error("Error accessing subscription portal:", error);
+    }
   };
 
   const handleLanguageChange = (language: string) => {
@@ -129,9 +133,9 @@ export function NavUser({
                 <IconUserCircle />
                 {t("common.account")}
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleManageSubscription}>
                 <IconCreditCard />
-                {t("common.billing")}
+                {t("common.manageSubscription")}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconNotification />

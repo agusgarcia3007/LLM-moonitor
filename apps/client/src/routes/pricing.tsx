@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon } from "lucide-react";
 import { useTransition } from "react";
-import { authClient } from "@/lib/auth-client";
+import { logout } from "@/lib/auth";
 
 export const Route = createFileRoute("/pricing")({
   component: PricingPage,
@@ -25,14 +25,8 @@ function PricingPage() {
 
   const handleDenyPayment = async () => {
     startTransition(async () => {
-      await authClient.signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            document.cookie =
-              "isAuthenticated=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            navigate({ to: "/" });
-          },
-        },
+      await logout(() => {
+        navigate({ to: "/" });
       });
     });
   };

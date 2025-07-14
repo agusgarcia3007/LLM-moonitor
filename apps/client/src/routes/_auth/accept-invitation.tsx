@@ -32,12 +32,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { authClient } from "@/lib/auth-client";
+import { logout } from "@/lib/auth";
 import {
   useAcceptInvitation,
   useRejectInvitation,
 } from "@/services/organizations/mutations";
 import { useGetInvitationByToken } from "@/services/organizations/query";
+import { authClient } from "@/lib/auth-client";
 
 const signupSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -577,8 +578,9 @@ function AcceptInvitationPage() {
               <Button
                 variant="outline"
                 onClick={async () => {
-                  await authClient.signOut();
-                  window.location.reload();
+                  await logout(() => {
+                    window.location.reload();
+                  });
                 }}
                 className="w-full"
               >

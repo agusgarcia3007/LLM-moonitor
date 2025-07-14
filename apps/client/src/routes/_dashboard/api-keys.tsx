@@ -40,12 +40,12 @@ export const Route = createFileRoute("/_dashboard/api-keys")({
   component: ApiKeysPage,
 });
 
-const formSchema = z.object({
-  keyName: z.string().min(1, { message: "apiKeys.error.enterName" }),
-});
-
 function ApiKeysPage() {
   const { t } = useTranslation();
+
+  const formSchema = z.object({
+    keyName: z.string().min(1, { message: t("apiKeys.error.enterName") }),
+  });
   const [isOpen, setIsOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

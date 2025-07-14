@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { setHasSubscription } from "@/lib/cookies";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -60,6 +61,8 @@ function Login({ className, ...props }: React.ComponentProps<"form">) {
           const activeSubscription = subscriptions?.find(
             (sub) => sub.status === "active" || sub.status === "trialing"
           );
+
+          setHasSubscription(!!activeSubscription);
 
           navigate({
             to: activeSubscription ? "/dashboard" : "/pricing",

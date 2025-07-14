@@ -1,4 +1,5 @@
 import { DashboardLayout } from "@/components/layout/dashboard";
+import { hasSubscription } from "@/lib/cookies";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 function isAuthenticated() {
@@ -14,6 +15,12 @@ export const Route = createFileRoute("/_dashboard")({
       throw redirect({
         to: "/login",
         search: { redirect: location.href },
+      });
+    }
+    
+    if (!hasSubscription()) {
+      throw redirect({
+        to: "/pricing",
       });
     }
   },

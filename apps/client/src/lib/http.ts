@@ -1,5 +1,5 @@
 import axios from "axios";
-import { authClient } from "./auth-client";
+import { logout } from "./auth";
 
 export const http = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -14,10 +14,9 @@ http.interceptors.response.use(
   async (error) => {
     // 403 = Authentication error -> logout user
     if (error.response?.status === 403) {
-      await authClient.signOut();
-      document.cookie =
-        "isAuthenticated=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      window.location.href = "/login";
+      await logout(() => {
+        window.location.href = "/login";
+      });
     }
     if (error.response?.status === 402) {
       window.location.href = "/pricing";
