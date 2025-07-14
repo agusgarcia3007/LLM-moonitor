@@ -1,13 +1,12 @@
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -64,18 +63,16 @@ const Slider = React.forwardRef<
     if (!showTooltip) return thumb;
 
     return (
-      <TooltipProvider>
-        <Tooltip open={showTooltipState}>
-          <TooltipTrigger asChild>{thumb}</TooltipTrigger>
-          <TooltipContent
-            className="px-2 py-1 text-xs"
-            sideOffset={8}
-            side={props.orientation === "vertical" ? "right" : "top"}
-          >
-            <p>{tooltipContent ? tooltipContent(value) : value}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip open={showTooltipState}>
+        <TooltipTrigger asChild>{thumb}</TooltipTrigger>
+        <TooltipContent
+          className="px-2 py-1 text-xs"
+          sideOffset={8}
+          side={props.orientation === "vertical" ? "right" : "top"}
+        >
+          <p>{tooltipContent ? tooltipContent(value) : value}</p>
+        </TooltipContent>
+      </Tooltip>
     );
   };
 

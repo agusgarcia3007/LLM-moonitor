@@ -17,7 +17,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>{children}</TooltipProvider>
+        <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
         <Toaster />
       </QueryClientProvider>
     </ThemeProvider>
