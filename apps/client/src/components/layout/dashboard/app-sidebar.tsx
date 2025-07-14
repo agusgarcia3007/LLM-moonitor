@@ -30,10 +30,11 @@ import {
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useGetSession } from "@/services/session/query";
+// import { useGetSession } from "@/services/session/query";
+import { authClient } from "@/lib/auth-client";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session, isPending, error } = useGetSession();
+  const { data: session, isPending, error } = authClient.useSession();
   const { open } = useSidebar();
   const { t } = useTranslation();
 
