@@ -84,7 +84,7 @@ export async function updateAllPrices() {
     .insert(model_prices)
     .values(priceValues)
     .onConflictDoUpdate({
-      target: model_prices.modelId,
+      target: [model_prices.modelId],
       set: {
         modelName: sql`excluded.model_name`,
         inputPrice: sql`excluded.input_price`,
