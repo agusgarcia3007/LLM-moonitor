@@ -24,6 +24,8 @@ export async function fetchPricesFromProvider(
     2. Include ALL model variations and versions (e.g., both "gpt-4o" and "gpt-4o-2024-08-06")
     3. Do NOT skip any models - we need complete coverage for user pricing calculations
     4. Look through the ENTIRE document, not just the first table
+    5. NEVER return duplicate modelId values - each modelId must be unique in the response
+    6. If the same model appears in multiple sections, include it only ONCE with complete pricing info
 
     Return a single JSON object with one key: "prices". The value must be an array containing ALL models found.
 
@@ -61,7 +63,10 @@ export async function fetchPricesFromProvider(
     - Extract embedding models, moderation models, transcription models - EVERYTHING
     - Model names like "gpt-4o-2024-08-06" should use the full name as modelId
 
-    MANDATORY: Scan the ENTIRE document thoroughly. Do not stop after finding a few models. We need COMPLETE coverage of all available models for accurate user billing.
+    MANDATORY: 
+    - Scan the ENTIRE document thoroughly. Do not stop after finding a few models. We need COMPLETE coverage of all available models for accurate user billing.
+    - Ensure each modelId appears only ONCE in your response. No duplicates allowed.
+    - If you find the same model in multiple sections, consolidate it into a single entry with all relevant pricing.
 
     Markdown content to parse:
     ---

@@ -9,6 +9,8 @@ import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { ROUTES } from "./routes";
 import { refreshPriceCache } from "@/lib/cost-calculator";
+import { updateAllPrices } from "@/services/models-pricing/orchestrator";
+import * as cron from "node-cron";
 
 (async () => {
   await refreshPriceCache();
@@ -37,6 +39,19 @@ app.onError((err, c) => {
 
 const alertScheduler = new AlertScheduler();
 alertScheduler.start(5);
+
+cron.schedule("0 0 * * *", async () => {
+  console.log("🔄 Starting daily pricing update at 00:00 AM...");
+  try {
+    await updateAllPrices();
+    await refreshPriceCache();
+    console.log("✅ Daily pricing update completed successfully");
+  } catch (error) {
+    console.error("❌ Error during daily pricing update:", error);
+  }
+});
+
+console.log("⏰ Daily pricing update cron job scheduled for 00:00 AM");
 
 process.on("SIGTERM", () => {
   console.log("Received SIGTERM, stopping alert scheduler...");

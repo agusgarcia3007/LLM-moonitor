@@ -42,11 +42,33 @@ export async function updateAllPrices() {
     return;
   }
 
-  console.log(
-    `💾 Saving or updating ${allPrices.length} model prices in the database...`
+  const modelIdCounts = new Map<string, number>();
+  allPrices.forEach((price) => {
+    modelIdCounts.set(
+      price.modelId,
+      (modelIdCounts.get(price.modelId) || 0) + 1
+    );
+  });
+
+  const duplicates = Array.from(modelIdCounts.entries()).filter(
+    ([_, count]) => count > 1
+  );
+  if (duplicates.length > 0) {
+    console.log(
+      `⚠️ Found duplicates:`,
+      duplicates.map(([id, count]) => `${id} (${count}x)`).join(", ")
+    );
+  }
+
+  const uniquePrices = Array.from(
+    new Map(allPrices.map((price) => [price.modelId, price])).values()
   );
 
-  const priceValues = allPrices.map((price) => ({
+  console.log(
+    `💾 Saving or updating ${uniquePrices.length} unique model prices in the database (deduplicated from ${allPrices.length})...`
+  );
+
+  const priceValues = uniquePrices.map((price) => ({
     modelId: price.modelId,
     modelName: price.modelName,
     provider: price.provider,
