@@ -17,26 +17,51 @@ export async function fetchPricesFromProvider(
   }
 
   const extractionPrompt = `
-    Based on the following markdown from a pricing page, extract the pricing information for each AI model.
-    Return a single JSON object with one key: "prices". The value of "prices" must be an array of objects.
+    You are extracting ALL pricing information from a comprehensive pricing page. You must find and extract EVERY SINGLE MODEL mentioned on the page, regardless of which section it appears in.
+
+    CRITICAL REQUIREMENTS:
+    1. Extract models from ALL sections: Latest models, Fine-tuning, Audio tokens, Image tokens, Embeddings, Moderation, Other models, Transcription, Speech generation, etc.
+    2. Include ALL model variations and versions (e.g., both "gpt-4o" and "gpt-4o-2024-08-06")
+    3. Do NOT skip any models - we need complete coverage for user pricing calculations
+    4. Look through the ENTIRE document, not just the first table
+
+    Return a single JSON object with one key: "prices". The value must be an array containing ALL models found.
 
     Each object in the "prices" array must follow this exact structure:
     {
-      "modelId": "the_api_ready_model_identifier",
-      "modelName": "The human-readable model name",
+      "modelId": "exact-technical-model-name-as-used-in-api",
+      "modelName": "Human readable model name",
       "provider": "${providerName}",
       "inputPrice": 0.00000,
       "outputPrice": 0.00000,
       "trainingPrice": 0.00000 (or null if not applicable),
-      "unit": "per_token" (must always be exactly the string "per_token" for all models. Never use any other value. Never return null or undefined. If the price is per million tokens, divide by 1,000,000 and return the price per token.),
+      "unit": "per_token",
       "trainingUnit": "per_token" (or "per_hour" if applicable, or null),
       "updatedAt": "2024-01-01T00:00:00.000Z"
     }
 
-    IMPORTANT:
-    - The "unit" field must always be exactly "per_token". If the price is per million tokens (e.g., "$5.00 / 1M tokens"), set "unit": "per_token" and divide the price by 1,000,000. Never return null, undefined, or any other value for the "unit" field.
-    - If the model does not have a price per token, omit it from the array (do not include objects with null or missing fields).
-    - All prices must be calculated PER SINGLE TOKEN. For example, $5.00 / 1M tokens becomes 0.000005.
+    CRITICAL - MODEL ID RULES:
+    - "modelId" MUST be the exact technical model name as used in API calls (e.g., "gpt-4o-mini", "claude-3-haiku-20240307", "text-embedding-3-small")
+    - Do NOT use descriptive names like "Embed 4" or "GPT 4 Turbo" for modelId
+    - Use the actual model identifier shown in the pricing tables (often in the left column)
+    - Examples: "gpt-4o-mini-tts", "whisper-1", "dall-e-3", "text-embedding-ada-002"
+    - If multiple versions exist, use the full version name (e.g., "gpt-4o-2024-08-06")
+
+    PRICING CONVERSION RULES:
+    - Convert ALL prices to cost per single token (divide by 1,000,000 if shown per 1M tokens)
+    - The "unit" field must ALWAYS be exactly "per_token" - never null or any other value
+    - If a model has different pricing for different use cases (text vs audio vs image), create separate entries
+    - For image generation models, convert per-image pricing to token equivalent if possible, or set both input/output to the same value
+    - For free models (like moderation), set prices to 0.0
+
+    SPECIAL INSTRUCTIONS:
+    - For models with only training costs, put the cost in trainingPrice and set input/output to 0
+    - For models with cached input pricing, use the regular input price (not cached)
+    - For models shown in multiple sections, include ALL variants
+    - Extract embedding models, moderation models, transcription models - EVERYTHING
+    - Model names like "gpt-4o-2024-08-06" should use the full name as modelId
+
+    MANDATORY: Scan the ENTIRE document thoroughly. Do not stop after finding a few models. We need COMPLETE coverage of all available models for accurate user billing.
 
     Markdown content to parse:
     ---

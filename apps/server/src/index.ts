@@ -8,6 +8,11 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { ROUTES } from "./routes";
+import { refreshPriceCache } from "@/lib/cost-calculator";
+
+(async () => {
+  await refreshPriceCache();
+})();
 
 const app = new Hono<HonoApp>()
   .use(cors(CORS_OPTIONS))

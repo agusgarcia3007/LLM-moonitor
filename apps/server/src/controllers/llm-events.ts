@@ -10,7 +10,7 @@ import {
 } from "@/lib/query-params";
 import { desc, asc, eq, count, and, sql } from "drizzle-orm";
 import { SORT_ORDER } from "@/lib/endpoint-builder";
-import { calculateCost } from "@/lib/cost-calculator";
+import { calculateCostFromCache } from "@/lib/cost-calculator";
 import { resolveOrganizationId } from "@/lib/resolve-organization";
 import { getActiveOrganization } from "@/lib/utils";
 
@@ -78,7 +78,7 @@ export const logEvent = async (c: Context) => {
 
   const calculatedCost =
     data.cost_usd ||
-    calculateCost(
+    calculateCostFromCache(
       data.provider,
       data.model,
       data.prompt_tokens || 0,

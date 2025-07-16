@@ -2,7 +2,8 @@ import { ModelPrice, model_prices } from "@/db/schema";
 import { fetchPricesFromProvider } from "./scrapper";
 import { db } from "@/db";
 import { sql } from "drizzle-orm";
-import { AI_PROVIDERS, Provider } from "@llmonitor/ai-providers";
+import { AI_PROVIDERS } from "@/lib/providers";
+import { Provider } from "@/types/providers";
 
 export async function updateAllPrices() {
   const providersToScrape = Object.entries(AI_PROVIDERS).map(

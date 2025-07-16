@@ -1,10 +1,10 @@
-import { ProviderConfig } from "./types";
+import { ProviderConfig } from "@/types/providers";
 
 export const AI_PROVIDERS: ProviderConfig = {
   openai: {
     name: "openai",
     displayName: "OpenAI",
-    pricingUrl: "https://openai.com/api/pricing/",
+    pricingUrl: "https://platform.openai.com/docs/pricing",
   },
   anthropic: {
     name: "anthropic",

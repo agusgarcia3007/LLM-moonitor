@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@better-auth/stripe": "^1.2.12",
-    "@llmonitor/ai-providers": "workspace:*",
     "@mendable/firecrawl-js": "^1.29.1",
     "@neondatabase/serverless": "^1.0.0",
     "better-auth": "^1.2.12",
