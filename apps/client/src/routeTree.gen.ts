@@ -22,7 +22,6 @@ import { Route as DashboardExperimentsRouteImport } from './routes/_dashboard/ex
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
 import { Route as DashboardCostAnalysisRouteImport } from './routes/_dashboard/cost-analysis'
 import { Route as DashboardApiKeysRouteImport } from './routes/_dashboard/api-keys'
-import { Route as DashboardAlertsRouteImport } from './routes/_dashboard/alerts'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
@@ -93,11 +92,6 @@ const DashboardApiKeysRoute = DashboardApiKeysRouteImport.update({
   path: '/api-keys',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardAlertsRoute = DashboardAlertsRouteImport.update({
-  id: '/alerts',
-  path: '/alerts',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -142,7 +136,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/signup': typeof AuthSignupRoute
-  '/alerts': typeof DashboardAlertsRoute
   '/api-keys': typeof DashboardApiKeysRoute
   '/cost-analysis': typeof DashboardCostAnalysisRoute
   '/dashboard': typeof DashboardDashboardRoute
@@ -162,7 +155,6 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/signup': typeof AuthSignupRoute
-  '/alerts': typeof DashboardAlertsRoute
   '/api-keys': typeof DashboardApiKeysRoute
   '/cost-analysis': typeof DashboardCostAnalysisRoute
   '/dashboard': typeof DashboardDashboardRoute
@@ -185,7 +177,6 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/signup': typeof AuthSignupRoute
-  '/_dashboard/alerts': typeof DashboardAlertsRoute
   '/_dashboard/api-keys': typeof DashboardApiKeysRoute
   '/_dashboard/cost-analysis': typeof DashboardCostAnalysisRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRoute
@@ -207,7 +198,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
-    | '/alerts'
     | '/api-keys'
     | '/cost-analysis'
     | '/dashboard'
@@ -227,7 +217,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
-    | '/alerts'
     | '/api-keys'
     | '/cost-analysis'
     | '/dashboard'
@@ -249,7 +238,6 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/reset-password'
     | '/_auth/signup'
-    | '/_dashboard/alerts'
     | '/_dashboard/api-keys'
     | '/_dashboard/cost-analysis'
     | '/_dashboard/dashboard'
@@ -363,13 +351,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardApiKeysRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/_dashboard/alerts': {
-      id: '/_dashboard/alerts'
-      path: '/alerts'
-      fullPath: '/alerts'
-      preLoaderRoute: typeof DashboardAlertsRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
     '/_auth/signup': {
       id: '/_auth/signup'
       path: '/signup'
@@ -456,7 +437,6 @@ const DashboardProjectsRouteWithChildren =
   DashboardProjectsRoute._addFileChildren(DashboardProjectsRouteChildren)
 
 interface DashboardRouteRouteChildren {
-  DashboardAlertsRoute: typeof DashboardAlertsRoute
   DashboardApiKeysRoute: typeof DashboardApiKeysRoute
   DashboardCostAnalysisRoute: typeof DashboardCostAnalysisRoute
   DashboardDashboardRoute: typeof DashboardDashboardRoute
@@ -467,7 +447,6 @@ interface DashboardRouteRouteChildren {
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
-  DashboardAlertsRoute: DashboardAlertsRoute,
   DashboardApiKeysRoute: DashboardApiKeysRoute,
   DashboardCostAnalysisRoute: DashboardCostAnalysisRoute,
   DashboardDashboardRoute: DashboardDashboardRoute,

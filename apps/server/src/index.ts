@@ -1,4 +1,3 @@
-import { AlertScheduler } from "@/lib/alert-scheduler";
 import { auth } from "@/lib/auth";
 import { CORS_OPTIONS } from "@/lib/constants";
 import { sessionMiddleware } from "@/middleware/auth";
@@ -37,33 +36,24 @@ app.onError((err, c) => {
   return c.text("Internal Server Error", 500);
 });
 
-const alertScheduler = new AlertScheduler();
-alertScheduler.start(5);
-
-cron.schedule("0 0 * * *", async () => {
-  console.log("🔄 Starting daily pricing update at 00:00 AM...");
-  try {
-    await updateAllPrices();
-    await refreshPriceCache();
-    console.log("✅ Daily pricing update completed successfully");
-  } catch (error) {
-    console.error("❌ Error during daily pricing update:", error);
+cron.schedule(
+  "0 0 * * *",
+  async () => {
+    console.log("🔄 Starting daily pricing update at 00:00 AM (ART)...");
+    try {
+      await updateAllPrices();
+      await refreshPriceCache();
+      console.log("✅ Daily pricing update completed successfully");
+    } catch (error) {
+      console.error("❌ Error during daily pricing update:", error);
+    }
+  },
+  {
+    timezone: "America/Argentina/Buenos_Aires",
   }
-});
+);
 
 console.log("⏰ Daily pricing update cron job scheduled for 00:00 AM");
-
-process.on("SIGTERM", () => {
-  console.log("Received SIGTERM, stopping alert scheduler...");
-  alertScheduler.stop();
-  process.exit(0);
-});
-
-process.on("SIGINT", () => {
-  console.log("Received SIGINT, stopping alert scheduler...");
-  alertScheduler.stop();
-  process.exit(0);
-});
 
 const port = parseInt(Bun.env.PORT || "4444", 10);
 

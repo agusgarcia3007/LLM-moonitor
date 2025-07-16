@@ -1,5 +1,4 @@
 import {
-  IconBell,
   IconBriefcase,
   IconCurrency,
   IconDashboard,
@@ -28,9 +27,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { useGetSession } from "@/services/session/query";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useGetSession } from "@/services/session/query";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session, isPending } = useGetSession();
@@ -72,11 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "/cost-analysis",
         icon: IconCurrency,
       },
-      {
-        title: t("navigation.alerts"),
-        url: "/alerts",
-        icon: IconBell,
-      },
+
       {
         title: t("navigation.experiments"),
         url: "/experiments",
