@@ -92,7 +92,7 @@ export async function updateAllPrices() {
         trainingPrice: sql`excluded.training_price`,
         unit: sql`excluded.unit`,
         trainingUnit: sql`excluded.training_unit`,
-        updatedAt: new Date(),
+        updatedAt: sql`excluded.updated_at`,
       },
     });
 
