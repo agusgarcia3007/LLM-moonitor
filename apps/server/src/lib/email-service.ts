@@ -28,47 +28,6 @@ export class EmailService {
     return result;
   }
 
-  async sendAlertEmail(
-    to: string,
-    alertName: string,
-    metric: string,
-    actualValue: number,
-    thresholdValue: number,
-    organizationName?: string
-  ): Promise<boolean> {
-    try {
-      const subject = `🚨 Alert Triggered: ${alertName}`;
-
-      const metricDisplayName = this.getMetricDisplayName(metric);
-      const formattedActualValue = this.formatMetricValue(metric, actualValue);
-      const formattedThresholdValue = this.formatMetricValue(
-        metric,
-        thresholdValue
-      );
-      const orgName = organizationName || "Your Organization";
-
-      const template = this.loadEmailTemplate("alert-email.html");
-      const htmlContent = this.replaceTemplatePlaceholders(template, {
-        alertName,
-        metricDisplayName,
-        formattedActualValue,
-        formattedThresholdValue,
-        organizationName: orgName,
-        metricDisplayNameLower: metricDisplayName.toLowerCase(),
-        timestamp: new Date().toLocaleString(),
-        dashboardUrl: `${siteData.url}/alerts`,
-        settingsUrl: `${siteData.url}/settings/alerts`,
-      });
-
-      const result = await sendEmail(to, subject, htmlContent);
-      console.log(`Alert email sent successfully to ${to}:`, result?.id);
-      return true;
-    } catch (error) {
-      console.error("Error sending alert email:", error);
-      return false;
-    }
-  }
-
   async sendInvitationEmail(
     to: string,
     organizationName: string,
@@ -152,7 +111,7 @@ export class EmailService {
         avgLatency: `${Math.round(stats.avgLatency)}ms`,
         totalCost: `$${stats.totalCost.toFixed(4)}`,
         dashboardUrl: `${siteData.url}/dashboard`,
-        settingsUrl: `${siteData.url}/settings/alerts`,
+        settingsUrl: `${siteData.url}/dashboard`,
       });
 
       const result = await sendEmail(to, subject, htmlContent);
@@ -165,62 +124,5 @@ export class EmailService {
       console.error("Error sending daily summary email:", error);
       return false;
     }
-  }
-
-  private getMetricDisplayName(metric: string): string {
-    const displayNames: Record<string, string> = {
-      // Alert sections
-      errors: "Errors",
-      latency: "Average Latency",
-      cost: "Average Cost",
-      summary: "Summary",
-      // Legacy metrics
-      cost_per_hour: "Cost per Hour",
-      cost_per_day: "Cost per Day",
-      cost_per_week: "Cost per Week",
-      cost_per_month: "Cost per Month",
-      requests_per_minute: "Requests per Minute",
-      requests_per_hour: "Requests per Hour",
-      error_rate: "Error Rate",
-      latency_p95: "Latency P95",
-      latency_p99: "Latency P99",
-      token_usage_per_hour: "Token Usage per Hour",
-      token_usage_per_day: "Token Usage per Day",
-    };
-    return displayNames[metric] || metric;
-  }
-
-  private formatMetricValue(metric: string, value: number): string {
-    // Alert sections formatting
-    if (metric === "errors") {
-      return `${Math.round(value)} errors`;
-    }
-    if (metric === "latency") {
-      return `${Math.round(value)}ms`;
-    }
-    if (metric === "cost") {
-      return `$${value.toFixed(4)}`;
-    }
-    if (metric === "summary") {
-      return value.toString();
-    }
-
-    // Legacy formatting
-    if (metric.startsWith("cost_")) {
-      return `$${value.toFixed(2)}`;
-    }
-    if (metric === "error_rate") {
-      return `${value.toFixed(1)}%`;
-    }
-    if (metric.startsWith("latency_")) {
-      return `${value.toFixed(0)}ms`;
-    }
-    if (metric.startsWith("token_usage_")) {
-      return value.toLocaleString() + " tokens";
-    }
-    if (metric.startsWith("requests_")) {
-      return value.toLocaleString() + " requests";
-    }
-    return value.toString();
   }
 }
