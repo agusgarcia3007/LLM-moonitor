@@ -102,10 +102,7 @@ export async function fetchPricesFromProvider(
   }
 
   const resultObject = JSON.parse(rawJson);
-  console.log(
-    `📊 AI output for ${providerName}:`,
-    JSON.stringify(resultObject, null, 2)
-  );
+
   const parsedPrices: ModelPrice[] = resultObject.prices || [];
 
   if (!Array.isArray(parsedPrices)) {
