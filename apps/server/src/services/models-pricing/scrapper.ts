@@ -17,78 +17,89 @@ export async function fetchPricesFromProvider(
   }
 
   const extractionPrompt = `
-You are a data extraction specialist. Your task is to extract ALL AI model pricing information from the provided ${providerName} pricing page content.
+🎯 MISSION: Extract 100% of ALL AI models from this ${providerName} pricing page. ZERO TOLERANCE for missing models.
 
-CRITICAL RULES:
-1. ONLY extract models that are EXPLICITLY mentioned in the provided content
-2. DO NOT invent, guess, or hallucinate any model names or prices
-3. Extract EVERY model you find - scan the ENTIRE document thoroughly
-4. Include both generic names (gpt-4o-mini) AND specific versions (gpt-4o-mini-2024-07-18) if both appear
-5. Look in ALL sections: Latest models, Legacy models, Fine-tuning, Audio, Images, Embeddings, Moderation, etc.
+📋 MANDATORY EXTRACTION AREAS (scan ALL of these):
+1. "Latest models" section - Main pricing table
+2. "Fine-tuning" section - Training models  
+3. "Audio tokens" table - Audio/speech models
+4. "Image tokens" table - Vision models
+5. "Transcription and speech generation" - Audio processing
+6. "Image generation" - DALL-E and image models
+7. "Embeddings" section - Embedding models
+8. "Moderation" section - Content moderation
+9. "Other models" section - Legacy/additional models
+10. ANY other section containing model names and prices
 
-REQUIRED JSON FORMAT:
+🔍 TABLE PROCESSING RULES:
+- Each table row = one potential model
+- Model names appear in FIRST column (may have multiple names per row)
+- When you see "modelname1<br>modelname2", extract BOTH as separate models
+- Example: "gpt-4o<br>gpt-4o-2024-08-06" = extract "gpt-4o" AND "gpt-4o-2024-08-06"
+- Prices in subsequent columns (Input/Output/Training)
+
+💰 PRICE CONVERSION (CRITICAL):
+- ALL prices shown as "per /1M tokens" or "per 1M tokens"
+- Convert: $X.XX per 1M = X.XX ÷ 1,000,000
+- Examples:
+  * $0.15 per 1M → 0.00000015
+  * $0.60 per 1M → 0.0000006  
+  * $2.50 per 1M → 0.0000025
+  * $15.00 per 1M → 0.000015
+
+🎯 REQUIRED JSON OUTPUT:
 {
   "prices": [
     {
-      "modelId": "exact-model-name-from-content",
-      "modelName": "Human readable display name",
+      "modelId": "exact-model-name-from-table",
+      "modelName": "Human readable name",
       "provider": "${providerName}",
       "inputPrice": 0.00000015,
       "outputPrice": 0.0000006,
       "trainingPrice": null,
       "unit": "per_token",
-      "trainingUnit": "per_token",
+      "trainingUnit": "per_token", 
       "updatedAt": "2024-01-01T00:00:00.000Z"
     }
   ]
 }
 
-PRICE CONVERSION RULES (CRITICAL):
-- Convert ALL prices to per-token basis
-- "$0.15 per 1M tokens" = 0.15 ÷ 1,000,000 = 0.00000015
-- "$0.60 per 1M tokens" = 0.60 ÷ 1,000,000 = 0.0000006 
-- "$3.00 per 1M tokens" = 3.00 ÷ 1,000,000 = 0.000003
-- "$0.30 per 1K tokens" = 0.30 ÷ 1,000 = 0.0003
+⚠️ CRITICAL FIELD RULES:
+- "unit" and "trainingUnit" NEVER null - use "per_token" for text, "per_image" for images, "per_second" for audio
+- For free models: set prices to 0
+- For training-only models: inputPrice=0, outputPrice=0, trainingPrice=value
+- For missing prices: use null (not 0)
 
-FIELD REQUIREMENTS:
-- "modelId": Use EXACT model name from pricing tables
-- "unit": MUST be "per_token" (for text), "per_image" (for images), or "per_second" (for audio) - NEVER null
-- "trainingUnit": MUST be "per_token" or appropriate unit - NEVER null
-- For models with only training costs: set inputPrice=0, outputPrice=0, unit="per_token"
-- For free models: set all prices to 0
+🔎 EXPECTED MODEL EXAMPLES (extract if present):
+OpenAI: gpt-4o, gpt-4o-mini, gpt-4o-2024-08-06, gpt-4o-mini-2024-07-18, o1, o1-mini, o3, o4-mini, gpt-4.1, gpt-4.1-mini, gpt-4.1-nano, text-embedding-3-small, dall-e-3, whisper-1, chatgpt-4o-latest...
 
-EXAMPLES OF REAL MODEL NAMES TO EXTRACT (if present):
-OpenAI: gpt-4o, gpt-4o-mini, gpt-4o-2024-08-06, gpt-4o-mini-2024-07-18, text-embedding-3-small, text-embedding-3-large, whisper-1, dall-e-3, dall-e-2, gpt-3.5-turbo, gpt-3.5-turbo-0125, etc.
+📊 VALIDATION CHECKLIST - YOU MUST VERIFY:
+✓ Scanned ALL sections mentioned above
+✓ Processed EVERY table row containing models
+✓ Extracted BOTH generic AND versioned names (gpt-4o AND gpt-4o-2024-08-06)
+✓ Applied price conversion correctly 
+✓ No null values in required fields
 
-Anthropic: claude-3-5-sonnet-20241022, claude-3-haiku-20240307, claude-3-opus-20240229, claude-3-sonnet-20240229, etc.
+🚨 ABSOLUTE REQUIREMENTS:
+- EXTRACT EVERY SINGLE MODEL mentioned anywhere in the content
+- DO NOT skip models because they seem similar or redundant  
+- DO NOT limit extraction to "popular" models only
+- DO NOT stop after finding 20-30 models - keep scanning until the END
+- If you find fewer than 40 models for OpenAI, you FAILED - try again
 
-Google: gemini-1.5-pro, gemini-1.5-flash, gemini-1.0-pro, text-embedding-004, etc.
-
-VALIDATION CHECKLIST:
-✓ All model names come directly from the content
-✓ All prices are mathematically converted correctly  
-✓ No null values in required fields (unit, trainingUnit)
-✓ Scanned entire document for all models
-✓ Included both generic and versioned model names where available
-
-NOW EXTRACT FROM THIS CONTENT:
+CONTENT TO SCAN:
 ---
 ${scrapeResponse.markdown}
 ---
 
-Extract EVERY model mentioned above. Do not skip any. Include both generic and versioned model names where available for example:
-- gpt-4o
-- gpt-4o-2024-08-06
-- gpt-4o-mini
-- gpt-4o-mini-2024-07-18
-- claude-3-5-sonnet-20241022
-- claude-3-haiku-20240307
+NOW EXECUTE: Scan every section, every table, every model. Return JSON with ALL models found. NO EXCEPTIONS.
   `;
 
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [{ role: "user", content: extractionPrompt }],
     response_format: { type: "json_object" },
+    temperature: 0, // Máxima precisión
   });
 
   const rawJson = response.choices[0].message.content;
@@ -102,6 +113,13 @@ Extract EVERY model mentioned above. Do not skip any. Include both generic and v
   if (!Array.isArray(parsedPrices)) {
     throw new Error(
       'The "prices" key in the OpenAI response was not an array.'
+    );
+  }
+
+  // Validación automática
+  if (providerName === "openai" && parsedPrices.length < 40) {
+    console.warn(
+      `⚠️ WARNING: Only found ${parsedPrices.length} models for OpenAI. Expected 40+. Possible incomplete extraction.`
     );
   }
 
