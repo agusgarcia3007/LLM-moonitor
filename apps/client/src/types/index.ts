@@ -89,5 +89,4 @@ export interface FrontAuthForTypes {
   };
 }
 
-export * from "./alerts";
 export * from "./analytics";
