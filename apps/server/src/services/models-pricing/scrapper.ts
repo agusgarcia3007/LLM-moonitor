@@ -42,6 +42,18 @@ export async function fetchPricesFromProvider(
       "updatedAt": "2024-01-01T00:00:00.000Z"
     }
 
+    🚨 CRITICAL PRICE CONVERSION RULES 🚨
+    ALWAYS convert prices to PER-TOKEN basis, NOT per million tokens:
+    
+    Examples of CORRECT conversions:
+    - "$0.15 per 1M input tokens" → inputPrice: 0.00000015 (divide by 1,000,000)
+    - "$0.60 per 1M output tokens" → outputPrice: 0.0000006 (divide by 1,000,000)
+    - "$3.00 per 1M training tokens" → trainingPrice: 0.000003 (divide by 1,000,000)
+    - "$0.30 per 1K tokens" → price: 0.0003 (divide by 1,000)
+    
+    MATHEMATICAL CHECK: Final prices should be in the range 0.0000001 to 0.001 for most models.
+    If any price is above 0.001, you probably forgot to divide by the appropriate factor.
+
     CRITICAL - MODEL ID RULES:
     - "modelId" MUST be the exact technical model name as used in API calls (e.g., "gpt-4o-mini", "claude-3-haiku-20240307", "text-embedding-3-small")
     - Do NOT use descriptive names like "Embed 4" or "GPT 4 Turbo" for modelId
@@ -50,7 +62,11 @@ export async function fetchPricesFromProvider(
     - If multiple versions exist, use the full version name (e.g., "gpt-4o-2024-08-06")
 
     PRICING CONVERSION RULES:
-    - Convert ALL prices to cost per single token (divide by 1,000,000 if shown per 1M tokens)
+    - Convert ALL prices to cost per single token
+    - If prices are shown "per 1M tokens" (like $0.15 per 1M), you MUST divide by 1,000,000 (result: 0.00000015)
+    - If prices are shown "per 1K tokens" (like $0.15 per 1K), you MUST divide by 1,000 (result: 0.00015)
+    - Example: "$0.15 per 1M tokens" becomes 0.00000015, NOT 0.00015
+    - Example: "$0.60 per 1M tokens" becomes 0.0000006, NOT 0.0006
     - The "unit" field must ALWAYS be exactly "per_token" - never null or any other value
     - If a model has different pricing for different use cases (text vs audio vs image), create separate entries
     - For image generation models, convert per-image pricing to token equivalent if possible, or set both input/output to the same value
@@ -75,7 +91,7 @@ export async function fetchPricesFromProvider(
   `;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: "gpt-4o",
     messages: [{ role: "user", content: extractionPrompt }],
     response_format: { type: "json_object" },
   });
@@ -86,6 +102,10 @@ export async function fetchPricesFromProvider(
   }
 
   const resultObject = JSON.parse(rawJson);
+  console.log(
+    `📊 AI output for ${providerName}:`,
+    JSON.stringify(resultObject, null, 2)
+  );
   const parsedPrices: ModelPrice[] = resultObject.prices || [];
 
   if (!Array.isArray(parsedPrices)) {

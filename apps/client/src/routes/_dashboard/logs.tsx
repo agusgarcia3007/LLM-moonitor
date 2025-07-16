@@ -52,8 +52,8 @@ export function LogsPage() {
     return {
       limit: pagination.pageSize,
       offset: (pagination.page - 1) * pagination.pageSize,
-      sort: sorting[0]?.id,
-      order: sorting[0]?.desc ? "desc" : "asc",
+      sort: sorting[0]?.id || "created_at",
+      order: sorting[0]?.desc !== false ? "desc" : "asc",
       ...appliedFilters,
     } as GetEventsParams;
   }, [pagination, sorting, appliedFilters]);
