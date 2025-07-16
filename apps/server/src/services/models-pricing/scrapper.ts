@@ -39,9 +39,13 @@ Each model object:
   "outputPrice": 0.0000006,
   "trainingPrice": null,
   "unit": "per_token", 
-  "trainingUnit": null,
+  "trainingUnit": "per_token",
   "updatedAt": "2024-01-01T00:00:00.000Z"
 }
+
+IMPORTANT: 
+- "unit" field is REQUIRED and cannot be null. Always use "per_token" unless dealing with images ("per_image") or audio ("per_second")
+- If a model only has training costs, still set unit to "per_token" and put inputPrice/outputPrice as 0
 
 PRICE CONVERSION:
 - "$0.15 per 1M tokens" = 0.15 ÷ 1,000,000 = 0.00000015
