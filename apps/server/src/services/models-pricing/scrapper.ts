@@ -110,19 +110,6 @@ NOW EXECUTE: Scan every section, every table, every model. Return JSON with ALL 
   const resultObject = JSON.parse(rawJson);
   const parsedPrices: ModelPrice[] = resultObject.prices || [];
 
-  if (!Array.isArray(parsedPrices)) {
-    throw new Error(
-      'The "prices" key in the OpenAI response was not an array.'
-    );
-  }
-
-  // Validación automática
-  if (providerName === "openai" && parsedPrices.length < 40) {
-    console.warn(
-      `⚠️ WARNING: Only found ${parsedPrices.length} models for OpenAI. Expected 40+. Possible incomplete extraction.`
-    );
-  }
-
   console.log(
     `✅ Extracted prices for ${providerName}: ${parsedPrices.length} models found.`
   );
