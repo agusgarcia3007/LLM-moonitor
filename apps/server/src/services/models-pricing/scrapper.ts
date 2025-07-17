@@ -39,13 +39,10 @@ export async function fetchPricesFromProvider(
 - Prices in subsequent columns (Input/Output/Training)
 
 💰 PRICE CONVERSION (CRITICAL):
-- ALL prices shown as "per /1M tokens" or "per 1M tokens"
-- Convert: $X.XX per 1M = X.XX ÷ 1,000,000
+- If the cell says “$X per **1M** tokens” → X / 1,000,000
+- If the cell says “$X per **1K** tokens” → X / 1,000
 - Examples:
-  * $0.15 per 1M → 0.00000015
-  * $0.60 per 1M → 0.0000006  
-  * $2.50 per 1M → 0.0000025
-  * $15.00 per 1M → 0.000015
+  * $0.15 per 1M → 1.5e-7 
 
 🎯 REQUIRED JSON OUTPUT:
 {
@@ -85,7 +82,6 @@ OpenAI: gpt-4o, gpt-4o-mini, gpt-4o-2024-08-06, gpt-4o-mini-2024-07-18, o1, o1-m
 - DO NOT skip models because they seem similar or redundant  
 - DO NOT limit extraction to "popular" models only
 - DO NOT stop after finding 20-30 models - keep scanning until the END
-- If you find fewer than 40 models for OpenAI, you FAILED - try again
 
 CONTENT TO SCAN:
 ---
