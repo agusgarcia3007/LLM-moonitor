@@ -276,28 +276,14 @@ export const global_stats = pgTable("global_stats", {
 });
 
 export const model_prices = pgTable("model_prices", {
-  // Usamos el ID del modelo como clave primaria para búsquedas rápidas. ej: "gpt-4o"
   modelId: text("model_id").primaryKey(),
-
-  // Nombre legible para mostrar en la UI, ej: "GPT-4o"
   modelName: text("model_name").notNull(),
-
-  // Proveedor, ej: "openai", "anthropic"
   provider: text("provider").notNull(),
-
-  // Precios por 1 token. Usamos 'real' para ser consistentes con 'cost_usd' en tu tabla llm_event.
-  // Pueden ser nulos para casos especiales (ej: modelos que solo tienen un costo fijo).
   inputPrice: real("input_price"),
   outputPrice: real("output_price"),
   trainingPrice: real("training_price"),
-
-  // La unidad para los precios de input/output. Por defecto, 'per_token'.
   unit: text("unit").notNull().default("per_token"),
-
-  // Unidad específica para el precio de training si es diferente (ej: 'per_hour').
   trainingUnit: text("training_unit"),
-
-  // Para saber siempre qué tan actual es el precio.
   updatedAt: timestamp("updated_at")
     .notNull()
     .$defaultFn(() => new Date()),
