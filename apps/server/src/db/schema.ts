@@ -142,7 +142,7 @@ export const llm_event = pgTable("llm_event", {
   id: text("id").primaryKey(),
   organization_id: text("organization_id")
     .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
+    .references(() => organization.id),
   project_id: text("project_id").references(() => project.id, {
     onDelete: "cascade",
   }),
