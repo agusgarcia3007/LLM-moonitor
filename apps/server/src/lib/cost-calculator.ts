@@ -30,7 +30,7 @@ export function calculateCostFromCache(
 ): number {
   const key = `${provider}::${model}`;
   const price = priceCache[key];
-  console.log(`[CACHE] Price for ${model} ${key}: ${price}`);
+  console.log(`[CACHE] Price for ${model} ${key}: ${JSON.stringify(price)}`);
   if (!price) return 0;
   const inputCost = (promptTokens || 0) * price.inputPrice;
   const outputCost = (completionTokens || 0) * price.outputPrice;
