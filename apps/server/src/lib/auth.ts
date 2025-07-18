@@ -186,9 +186,21 @@ export const auth = betterAuth({
           };
         },
         onSubscriptionComplete: async ({ stripeSubscription }) => {
+          const subscription = await stripeClient.subscriptions.retrieve(
+            stripeSubscription.id,
+            {
+              expand: ["items.data.price"],
+            }
+          );
+
+          const mainItem = subscription.items.data[0];
+          const isMonthly = mainItem.price.recurring?.interval === "month";
+
           await stripeClient.subscriptionItems.create({
             subscription: stripeSubscription.id,
-            price: "price_1Rjl2dBvY3hUsoTtgGFrUViN", // add-on metered (0.00002 USD/event)
+            price: isMonthly
+              ? "price_1Rjl2dBvY3hUsoTtgGFrUViN"
+              : "price_1RmJe9BvY3hUsoTtS3Js1CNm",
           });
         },
       },
