@@ -55,8 +55,6 @@ export const useSetActiveOrganization = () => {
       queryClient.invalidateQueries({ queryKey: ["organization"] });
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
       queryClient.invalidateQueries({ queryKey: ["activeMember"] });
-      queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
-      queryClient.invalidateQueries({ queryKey: ["session"] });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["llm-events"], exact: false });
       queryClient.invalidateQueries({
@@ -79,8 +77,6 @@ export const useSetActiveOrganizationBySlug = () => {
       queryClient.invalidateQueries({ queryKey: ["organization"] });
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
       queryClient.invalidateQueries({ queryKey: ["activeMember"] });
-      queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
-      queryClient.invalidateQueries({ queryKey: ["session"] });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["llm-events"], exact: false });
       queryClient.invalidateQueries({
