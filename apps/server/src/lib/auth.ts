@@ -10,7 +10,7 @@ import {
   customSession,
 } from "better-auth/plugins";
 import { randomUUID } from "crypto";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import Stripe from "stripe";
 import { siteData, TRUSTED_ORIGINS } from "./constants";
 import { EmailService } from "./email-service";
@@ -139,6 +139,23 @@ export const auth = betterAuth({
       subscription: {
         enabled: true,
         organization: { enabled: true },
+        authorizeReference: async ({ user, referenceId, action }) => {
+          // All subscriptions are organization-based
+          // Check if user has permission to manage organization subscriptions
+          const member = await db
+            .select()
+            .from(schema.member)
+            .where(
+              and(
+                eq(schema.member.userId, user.id),
+                eq(schema.member.organizationId, referenceId)
+              )
+            )
+            .limit(1);
+
+          // Only owners and admins can manage organization subscriptions
+          return member[0]?.role === "owner" || member[0]?.role === "admin";
+        },
         plans: [
           {
             name: "pro-lite",

@@ -66,13 +66,25 @@ function Signup({ className, ...props }: React.ComponentProps<"form">) {
         onSuccess: async () => {
           if (plan && period) {
             try {
+              const { data: sessionData } = await authClient.getSession();
+              const organizationId = sessionData?.session?.activeOrganizationId;
+
+              if (!organizationId) {
+                console.error(
+                  "No active organization found for subscription upgrade"
+                );
+                navigate({ to: "/pricing" });
+                return;
+              }
+
               await authClient.subscription.upgrade({
                 plan,
                 annual: period === "yearly",
+                referenceId: organizationId,
                 successUrl: `${window.location.origin}/dashboard`,
                 cancelUrl: `${window.location.origin}/pricing`,
               });
-              return; // checkout redirection happens
+              return;
             } catch (err) {
               console.error(err);
             }
@@ -84,7 +96,7 @@ function Signup({ className, ...props }: React.ComponentProps<"form">) {
     setLoading(false);
   }
 
-  if (import.meta.env.NODE_ENV !== "production") {
+  if (import.meta.env.NODE_ENV === "production") {
     return (
       <div className="flex flex-col gap-6 max-w-md mx-auto">
         <Card className="p-8">

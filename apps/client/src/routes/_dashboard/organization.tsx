@@ -72,6 +72,7 @@ import {
   useUpdateMemberRole,
   useCancelInvitation,
 } from "@/services/organizations/mutations";
+import { useOrganizationSubscription } from "@/services/subscriptions/query";
 
 export const Route = createFileRoute("/_dashboard/organization")({
   component: OrganizationPage,
@@ -103,6 +104,8 @@ interface Invitation {
 function OrganizationPage() {
   const { t } = useTranslation();
   const { data: organization, isLoading } = useGetOrganization();
+  const { data: subscriptions, isLoading: isSubscriptionLoading } =
+    useOrganizationSubscription(organization?.id);
 
   const { mutate: updateOrganization, isPending: isUpdating } =
     useUpdateOrganization();
@@ -557,6 +560,62 @@ function OrganizationPage() {
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Subscription</CardTitle>
+          <CardDescription>
+            Organization subscription plan and billing information
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isSubscriptionLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-48" />
+            </div>
+          ) : subscriptions && subscriptions.length > 0 ? (
+            <div className="space-y-4">
+              {subscriptions.map((subscription) => (
+                <div key={subscription.id} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">
+                        {subscription.plan.replace("-", " ").toUpperCase()}
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        Status:{" "}
+                        <Badge
+                          variant={
+                            subscription.status === "active"
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
+                          {subscription.status}
+                        </Badge>
+                      </p>
+                    </div>
+                  </div>
+                  {subscription.periodEnd && (
+                    <p className="text-sm text-muted-foreground">
+                      Next billing:{" "}
+                      {new Date(subscription.periodEnd).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <p className="text-muted-foreground">No active subscription</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                This organization is on the free plan
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

@@ -17,6 +17,22 @@ export class SubscriptionService {
     return data;
   }
 
+  public static async getCurrentOrganizationSubscriptions() {
+    try {
+      const { data: sessionData } = await authClient.getSession();
+      const organizationId = sessionData?.session?.activeOrganizationId;
+
+      if (!organizationId) {
+        return [];
+      }
+
+      return this.getSubscriptions(organizationId);
+    } catch (error) {
+      console.error("Error fetching organization subscriptions:", error);
+      return [];
+    }
+  }
+
   public static async upgradeSubscription(params: UpgradeSubscriptionParams) {
     const { data, error } = await authClient.subscription.upgrade({
       plan: params.plan,

@@ -65,7 +65,11 @@ export async function getActiveProject(userId: string) {
 }
 
 export async function getActiveSubscription(userId: string) {
-  const [sub] = await db
+  // Get active organization subscription
+  const activeOrg = await getActiveOrganization(userId);
+  if (!activeOrg) return null;
+
+  const [orgSub] = await db
     .select({
       plan: schema.subscription.plan,
       status: schema.subscription.status,
@@ -74,11 +78,11 @@ export async function getActiveSubscription(userId: string) {
     .from(schema.subscription)
     .where(
       and(
-        eq(schema.subscription.referenceId, userId),
+        eq(schema.subscription.referenceId, activeOrg.id),
         inArray(schema.subscription.status, ["active", "trialing"])
       )
     )
     .limit(1);
 
-  return sub;
+  return orgSub;
 }

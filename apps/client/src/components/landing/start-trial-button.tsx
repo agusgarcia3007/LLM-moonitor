@@ -40,9 +40,18 @@ export function StartTrialButton({
       }
 
       try {
+        const { data: sessionData } = await authClient.getSession();
+        const organizationId = sessionData?.session?.activeOrganizationId;
+
+        if (!organizationId) {
+          toast.error("No active organization found. Please contact support.");
+          return;
+        }
+
         await authClient.subscription.upgrade({
           plan: planSlug,
           annual: billingPeriod === "yearly",
+          referenceId: organizationId,
           successUrl: `${window.location.origin}/dashboard`,
           cancelUrl: `${window.location.origin}/#pricing`,
         });
