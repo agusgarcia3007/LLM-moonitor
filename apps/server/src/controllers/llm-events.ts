@@ -1,7 +1,13 @@
 import { Context } from "hono";
 import { LogLlmEventSchema } from "../schemas/llm-events";
 import { db } from "@/db";
-import { llm_event, global_stats, type LLMEventMetadata } from "@/db/schema";
+import {
+  llm_event,
+  global_stats,
+  type LLMEventMetadata,
+  project,
+  member,
+} from "@/db/schema";
 import {
   parseQueryParams,
   createSortHelpers,
@@ -11,8 +17,8 @@ import {
 import { desc, asc, eq, count, and, sql } from "drizzle-orm";
 import { SORT_ORDER } from "@/lib/endpoint-builder";
 import { calculateCostFromCache } from "@/lib/cost-calculator";
-import { resolveOrganizationId } from "@/lib/resolve-organization";
-import { getActiveOrganization } from "@/lib/utils";
+import { resolveProjectId } from "@/lib/resolve-project";
+import { getActiveProject } from "@/lib/utils";
 
 const SORTABLE_FIELDS = [
   "created_at",
@@ -35,66 +41,97 @@ export const logEvent = async (c: Context) => {
   const data = LogLlmEventSchema.parse(body);
   const apiKey = c.req.header("x-api-key");
 
-  const organizationId = await resolveOrganizationId(
+  const projectId = await resolveProjectId(
     { projectId: body.projectId, organizationId: body.organizationId },
     session,
-    getActiveOrganization
+    getActiveProject
   );
 
-  if (!organizationId) {
+  if (!projectId) {
     console.warn(
-      "[logEvent] Missing projectId and unable to resolve default organization"
+      "[logEvent] Missing projectId and unable to resolve default project"
     );
     return c.json(
       {
         success: false,
-        message: "projectId (organizationId) is required",
+        message: "projectId is required",
       },
       200
     );
   }
 
   if (session && session.userId) {
-    const member = await db
-      .select()
-      .from(require("@/db/schema").member)
-      .where(
-        and(
-          eq(require("@/db/schema").member.userId, session.userId),
-          eq(require("@/db/schema").member.organizationId, organizationId)
-        )
-      );
+    const projectWithOrg = await db
+      .select({ organizationId: project.organizationId })
+      .from(project)
+      .where(eq(project.id, projectId))
+      .limit(1);
 
-    if (!member.length) {
+    if (!projectWithOrg.length) {
       return c.json(
         {
           success: false,
-          message: "User is not a member of this organization",
+          message: "Project not found",
+        },
+        404
+      );
+    }
+
+    const userMember = await db
+      .select()
+      .from(member)
+      .where(
+        and(
+          eq(member.userId, session.userId),
+          eq(member.organizationId, projectWithOrg[0].organizationId)
+        )
+      );
+
+    if (!userMember.length) {
+      return c.json(
+        {
+          success: false,
+          message: "User is not a member of this project's organization",
         },
         403
       );
     }
   }
 
-  const calculatedCost =
-    data.cost_usd ||
-    calculateCostFromCache(
-      data.provider,
-      data.model,
-      data.prompt_tokens || 0,
-      data.completion_tokens || 0
-    );
+  const calculatedCost = calculateCostFromCache(
+    data.provider,
+    data.model,
+    data.prompt_tokens || 0,
+    data.completion_tokens || 0
+  );
 
   const metadata: LLMEventMetadata = {
     ...(data.metadata || {}),
     apiKey,
   };
 
+  const projectData = await db
+    .select({ organizationId: project.organizationId })
+    .from(project)
+    .where(eq(project.id, projectId))
+    .limit(1);
+
+  if (!projectData.length) {
+    return c.json(
+      {
+        success: false,
+        message: "Project not found",
+      },
+      404
+    );
+  }
+
   const insert = await db.insert(llm_event).values({
     id: crypto.randomUUID(),
     ...data,
     cost_usd: calculatedCost,
-    organization_id: organizationId,
+    organization_id: projectData[0].organizationId,
+    project_id: projectId,
     metadata,
   });
 
@@ -126,6 +163,17 @@ export const getEvents = async (c: Context) => {
     );
   }
 
+  const activeProject = await getActiveProject(session.userId);
+  if (!activeProject) {
+    return c.json(
+      {
+        success: false,
+        message: "No active project found",
+      },
+      400
+    );
+  }
+
   const { limit, offset, sort, order } = parseQueryParams(
     c,
     allowedSortFields as unknown as string[]
@@ -133,7 +181,7 @@ export const getEvents = async (c: Context) => {
 
   const apiKey = c.req.query("apiKey");
   const filters = parseEventFilters(c);
-  const organizationId = session.activeOrganizationId;
+  const projectId = activeProject.id;
 
   const orderBy =
     order === SORT_ORDER.ASC
@@ -141,7 +189,7 @@ export const getEvents = async (c: Context) => {
       : desc(sortFieldMap[sort as keyof typeof sortFieldMap]);
 
   const whereConditions = buildEventWhereConditions({
-    organizationId,
+    projectId,
     apiKey,
     filters,
   });

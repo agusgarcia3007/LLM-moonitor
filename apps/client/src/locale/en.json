@@ -156,6 +156,7 @@
     "loading": "Loading",
     "cancel": "Cancel",
     "save": "Save",
+    "saving": "Saving",
     "delete": "Delete",
     "edit": "Edit",
     "create": "Create",
@@ -229,6 +230,7 @@
   "navigation": {
     "dashboard": "Dashboard",
     "projects": "Projects",
+    "organization": "Organization",
     "logs": "Logs",
     "costAnalysis": "Cost Analysis",
     "alerts": "Alerts",
@@ -495,10 +497,13 @@
     "title": "Projects",
     "description": "Manage your projects and organize your AI monitoring",
     "createProject": "Create Project",
+    "editProject": "Edit Project",
+    "projects": "Projects",
     "createFirstProject": "Create your first project",
     "noProjectsTitle": "No projects yet",
     "noProjectsDescription": "Create your first project to start organizing your AI monitoring",
     "projectName": "Project Name",
+    "enterProjectName": "Enter project name",
     "projectLogo": "Project Logo",
     "projectCreated": "Project created successfully",
     "projectUpdated": "Project updated successfully",
@@ -591,8 +596,7 @@
     "email": "Email",
     "changeRole": "Change Role",
     "removeMember": "Remove Member",
-    "inviteMemberDescription": "Invite a new member to join this organization",
-    "description": "Description"
+    "inviteMemberDescription": "Invite a new member to join this organization"
   },
   "costAnalysis": {
     "title": "Cost Analysis",
@@ -685,7 +689,16 @@
     "copied": "Copied to clipboard",
     "empty_action": "No actions available",
     "copy_id": "Copy ID",
-    "add_project": "Add Project"
+    "add_project": "Add Project",
+    "organizations": "Organizations",
+    "editAction": "Edit",
+    "deleteAction": "Delete",
+    "title": "Organization",
+    "description": "Manage your organization settings and members",
+    "members": "Members",
+    "membersDescription": "View and manage organization members",
+    "slug": "Slug",
+    "organizationInfo": "Organization Information"
   },
   "logs": {
     "title": "Logs",

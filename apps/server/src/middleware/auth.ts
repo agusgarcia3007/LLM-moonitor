@@ -1,5 +1,9 @@
 import { auth } from "@/lib/auth";
-import { getActiveOrganization, getActiveSubscription } from "@/lib/utils";
+import {
+  getActiveOrganization,
+  getActiveSubscription,
+  getActiveProject,
+} from "@/lib/utils";
 import { Context, Next } from "hono";
 
 export const sessionMiddleware = async (c: Context, next: Next) => {
@@ -11,10 +15,11 @@ export const sessionMiddleware = async (c: Context, next: Next) => {
     return next();
   }
 
-  // Enrich session with subscription data
-  const [organization, sub] = await Promise.all([
+  // Enrich session with subscription and project data
+  const [organization, sub, activeProject] = await Promise.all([
     getActiveOrganization(session.user.id),
     getActiveSubscription(session.user.id),
+    getActiveProject(session.user.id),
   ]);
 
   const enrichedSession = {
@@ -22,6 +27,8 @@ export const sessionMiddleware = async (c: Context, next: Next) => {
     // Priorizar session.activeOrganizationId sobre el lookup de DB
     activeOrganizationId:
       session.session.activeOrganizationId ?? organization?.id ?? null,
+    activeProjectId:
+      (session.session as any).activeProjectId ?? activeProject?.id ?? null,
     subscriptionPlan: sub?.plan ?? null,
     subscriptionStatus: sub?.status ?? null,
     subscriptionPeriodEnd: sub?.periodEnd ? sub.periodEnd.toISOString() : null,

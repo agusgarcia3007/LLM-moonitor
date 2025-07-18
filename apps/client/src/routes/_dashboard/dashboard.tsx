@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboardStatsQuery } from "@/services/analytics/query";
+import { useGetSession } from "@/services/session/query";
 import type { DashboardStats } from "@/types/analytics";
 import { formatCompactNumber } from "@/lib/utils";
 
@@ -58,9 +59,11 @@ export function Dashboard() {
   const { t } = useTranslation();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
+  const { data: session } = useGetSession();
 
   const days = parseInt(search.period);
-  const { data: stats, isLoading } = useDashboardStatsQuery(days);
+  const projectId = session?.session?.activeProjectId;
+  const { data: stats, isLoading } = useDashboardStatsQuery(days, projectId);
 
   const overview = stats?.overview || {
     totalEvents: 0,

@@ -12,30 +12,13 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { useCreateOrganization } from "@/services/organizations/mutations";
-import { useCheckSlug } from "@/services/organizations/query";
+import { useCreateProject } from "@/services/projects/mutations";
+import { useGetOrganization } from "@/services/organizations/query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useEffect, useState } from "react";
-
-const useDebounce = <T,>(value: T, delay?: number): T => {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delay || 500);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
 
 const createProjectSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  slug: z.string().min(1, "Slug is required"),
-  logo: z.string(),
 });
 
 type CreateProjectFormData = z.infer<typeof createProjectSchema>;
@@ -50,62 +33,29 @@ export function CreateProjectDialog({
   onOpenChange,
 }: CreateProjectDialogProps) {
   const { t } = useTranslation();
-  const createOrganization = useCreateOrganization();
-  const [manualSlugEdit, setManualSlugEdit] = useState(false);
+  const { mutateAsync: createProject, isPending } = useCreateProject();
+  const { data: activeOrganization } = useGetOrganization();
 
   const form = useForm<CreateProjectFormData>({
     resolver: zodResolver(createProjectSchema),
     defaultValues: {
       name: "",
-      slug: "",
-      logo: "",
     },
   });
 
-  const watchedName = form.watch("name");
-  const watchedSlug = form.watch("slug");
-  const debouncedSlug = useDebounce(watchedSlug, 500);
-  const isSlugDirty = form.formState.dirtyFields.slug;
-
-  const { data: slugCheck, isLoading: isCheckingSlug } = useCheckSlug(
-    debouncedSlug && isSlugDirty ? debouncedSlug : ""
-  );
-
-  useEffect(() => {
-    if (!manualSlugEdit && watchedName) {
-      const autoSlug = watchedName
-        .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/[^a-z0-9-]/g, "");
-      form.setValue("slug", autoSlug);
-    }
-  }, [watchedName, manualSlugEdit, form]);
-
-  useEffect(() => {
-    if (debouncedSlug && slugCheck && !slugCheck.status) {
-      form.setError("slug", {
-        type: "manual",
-        message: "This slug is already taken",
-      });
-    } else if (debouncedSlug && slugCheck?.status) {
-      form.clearErrors("slug");
-    }
-  }, [debouncedSlug, slugCheck, form]);
-
   const handleSave = async (values: CreateProjectFormData) => {
-    try {
-      await createOrganization.mutateAsync({
-        name: values.name,
-        slug: values.slug,
-        logo: values.logo,
-      });
-      toast.success(t("projects.projectCreated"));
-      onOpenChange(false);
-      form.reset({ name: "", slug: "", logo: "" });
-      setManualSlugEdit(false);
-    } catch {
-      toast.error(t("common.error"));
+    if (!activeOrganization?.id) {
+      toast.error("No active organization found");
+      return;
     }
+
+    await createProject({
+      name: values.name,
+      organizationId: activeOrganization.id,
+    });
+    toast.success(t("projects.projectCreated"));
+    onOpenChange(false);
+    form.reset({ name: "" });
   };
 
   return (
@@ -121,47 +71,7 @@ export function CreateProjectDialog({
                 <FormItem>
                   <FormLabel>{t("projects.projectName")}</FormLabel>
                   <FormControl>
-                    <Input {...field} autoFocus />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="slug"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("projects.slug")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      onChange={(e) => {
-                        setManualSlugEdit(true);
-                        field.onChange(e);
-                      }}
-                    />
-                  </FormControl>
-                  {isCheckingSlug && debouncedSlug && isSlugDirty && (
-                    <p className="text-sm text-muted-foreground">
-                      Checking availability...
-                    </p>
-                  )}
-                  {debouncedSlug && isSlugDirty && slugCheck?.status && (
-                    <p className="text-sm text-green-600">Slug is available</p>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="logo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("projects.projectLogo")}</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="https://..." />
+                    <Input {...field} autoFocus placeholder="My AI Project" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -175,14 +85,7 @@ export function CreateProjectDialog({
               >
                 {t("common.cancel")}
               </Button>
-              <Button
-                type="submit"
-                isLoading={createOrganization.isPending}
-                disabled={
-                  (isSlugDirty && isCheckingSlug) ||
-                  (!!debouncedSlug && isSlugDirty && !slugCheck?.status)
-                }
-              >
+              <Button type="submit" isLoading={isPending}>
                 {t("common.create")}
               </Button>
             </div>

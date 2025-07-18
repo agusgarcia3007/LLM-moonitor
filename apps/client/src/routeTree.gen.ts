@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LandingAboutRouteImport } from './routes/_landing/about'
 import { Route as DashboardUsersRouteImport } from './routes/_dashboard/users'
 import { Route as DashboardProjectsRouteImport } from './routes/_dashboard/projects'
+import { Route as DashboardOrganizationRouteImport } from './routes/_dashboard/organization'
 import { Route as DashboardLogsRouteImport } from './routes/_dashboard/logs'
 import { Route as DashboardExperimentsRouteImport } from './routes/_dashboard/experiments'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
@@ -28,7 +29,6 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AuthAcceptInvitationRouteImport } from './routes/_auth/accept-invitation'
 import { Route as DashboardProjectsIndexRouteImport } from './routes/_dashboard/projects/index'
-import { Route as DashboardProjectsIdRouteImport } from './routes/_dashboard/projects/$id'
 
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
@@ -65,6 +65,11 @@ const DashboardUsersRoute = DashboardUsersRouteImport.update({
 const DashboardProjectsRoute = DashboardProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardOrganizationRoute = DashboardOrganizationRouteImport.update({
+  id: '/organization',
+  path: '/organization',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardLogsRoute = DashboardLogsRouteImport.update({
@@ -122,11 +127,6 @@ const DashboardProjectsIndexRoute = DashboardProjectsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardProjectsRoute,
 } as any)
-const DashboardProjectsIdRoute = DashboardProjectsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => DashboardProjectsRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -141,10 +141,10 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardDashboardRoute
   '/experiments': typeof DashboardExperimentsRoute
   '/logs': typeof DashboardLogsRoute
+  '/organization': typeof DashboardOrganizationRoute
   '/projects': typeof DashboardProjectsRouteWithChildren
   '/users': typeof DashboardUsersRoute
   '/about': typeof LandingAboutRoute
-  '/projects/$id': typeof DashboardProjectsIdRoute
   '/projects/': typeof DashboardProjectsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -160,9 +160,9 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardDashboardRoute
   '/experiments': typeof DashboardExperimentsRoute
   '/logs': typeof DashboardLogsRoute
+  '/organization': typeof DashboardOrganizationRoute
   '/users': typeof DashboardUsersRoute
   '/about': typeof LandingAboutRoute
-  '/projects/$id': typeof DashboardProjectsIdRoute
   '/projects': typeof DashboardProjectsIndexRoute
 }
 export interface FileRoutesById {
@@ -182,10 +182,10 @@ export interface FileRoutesById {
   '/_dashboard/dashboard': typeof DashboardDashboardRoute
   '/_dashboard/experiments': typeof DashboardExperimentsRoute
   '/_dashboard/logs': typeof DashboardLogsRoute
+  '/_dashboard/organization': typeof DashboardOrganizationRoute
   '/_dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/_dashboard/users': typeof DashboardUsersRoute
   '/_landing/about': typeof LandingAboutRoute
-  '/_dashboard/projects/$id': typeof DashboardProjectsIdRoute
   '/_dashboard/projects/': typeof DashboardProjectsIndexRoute
 }
 export interface FileRouteTypes {
@@ -203,10 +203,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/experiments'
     | '/logs'
+    | '/organization'
     | '/projects'
     | '/users'
     | '/about'
-    | '/projects/$id'
     | '/projects/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -222,9 +222,9 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/experiments'
     | '/logs'
+    | '/organization'
     | '/users'
     | '/about'
-    | '/projects/$id'
     | '/projects'
   id:
     | '__root__'
@@ -243,10 +243,10 @@ export interface FileRouteTypes {
     | '/_dashboard/dashboard'
     | '/_dashboard/experiments'
     | '/_dashboard/logs'
+    | '/_dashboard/organization'
     | '/_dashboard/projects'
     | '/_dashboard/users'
     | '/_landing/about'
-    | '/_dashboard/projects/$id'
     | '/_dashboard/projects/'
   fileRoutesById: FileRoutesById
 }
@@ -314,6 +314,13 @@ declare module '@tanstack/react-router' {
       path: '/projects'
       fullPath: '/projects'
       preLoaderRoute: typeof DashboardProjectsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/_dashboard/organization': {
+      id: '/_dashboard/organization'
+      path: '/organization'
+      fullPath: '/organization'
+      preLoaderRoute: typeof DashboardOrganizationRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/_dashboard/logs': {
@@ -393,13 +400,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsIndexRouteImport
       parentRoute: typeof DashboardProjectsRoute
     }
-    '/_dashboard/projects/$id': {
-      id: '/_dashboard/projects/$id'
-      path: '/$id'
-      fullPath: '/projects/$id'
-      preLoaderRoute: typeof DashboardProjectsIdRouteImport
-      parentRoute: typeof DashboardProjectsRoute
-    }
   }
 }
 
@@ -424,12 +424,10 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 )
 
 interface DashboardProjectsRouteChildren {
-  DashboardProjectsIdRoute: typeof DashboardProjectsIdRoute
   DashboardProjectsIndexRoute: typeof DashboardProjectsIndexRoute
 }
 
 const DashboardProjectsRouteChildren: DashboardProjectsRouteChildren = {
-  DashboardProjectsIdRoute: DashboardProjectsIdRoute,
   DashboardProjectsIndexRoute: DashboardProjectsIndexRoute,
 }
 
@@ -442,6 +440,7 @@ interface DashboardRouteRouteChildren {
   DashboardDashboardRoute: typeof DashboardDashboardRoute
   DashboardExperimentsRoute: typeof DashboardExperimentsRoute
   DashboardLogsRoute: typeof DashboardLogsRoute
+  DashboardOrganizationRoute: typeof DashboardOrganizationRoute
   DashboardProjectsRoute: typeof DashboardProjectsRouteWithChildren
   DashboardUsersRoute: typeof DashboardUsersRoute
 }
@@ -452,6 +451,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardDashboardRoute: DashboardDashboardRoute,
   DashboardExperimentsRoute: DashboardExperimentsRoute,
   DashboardLogsRoute: DashboardLogsRoute,
+  DashboardOrganizationRoute: DashboardOrganizationRoute,
   DashboardProjectsRoute: DashboardProjectsRouteWithChildren,
   DashboardUsersRoute: DashboardUsersRoute,
 }

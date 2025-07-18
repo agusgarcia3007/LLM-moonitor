@@ -6,6 +6,17 @@ import { eq, sql, gte, desc, and, count } from "drizzle-orm";
 export const getDashboardStats = async (c: Context) => {
   const session = await c.get("session");
   const days = parseInt(c.req.query("days") || "1");
+  const projectId = c.req.query("projectId");
+
+  if (!projectId) {
+    return c.json(
+      {
+        success: false,
+        message: "Project ID is required",
+      },
+      400
+    );
+  }
 
   let startDate: Date;
   if (days === 1) {
@@ -19,7 +30,7 @@ export const getDashboardStats = async (c: Context) => {
   }
 
   const whereClause = and(
-    eq(llm_event.organization_id, session.activeOrganizationId),
+    eq(llm_event.project_id, projectId),
     gte(llm_event.created_at, startDate)
   );
 
@@ -135,11 +146,23 @@ export const getDashboardStats = async (c: Context) => {
 export const getCostAnalysis = async (c: Context) => {
   const session = await c.get("session");
   const days = parseInt(c.req.query("days") || "30");
+  const projectId = c.req.query("projectId");
+
+  if (!projectId) {
+    return c.json(
+      {
+        success: false,
+        message: "Project ID is required",
+      },
+      400
+    );
+  }
+
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
 
   const whereClause = and(
-    eq(llm_event.organization_id, session.activeOrganizationId),
+    eq(llm_event.project_id, projectId),
     gte(llm_event.created_at, startDate)
   );
 

@@ -1,5 +1,5 @@
-import { IconBriefcase, IconPlus, IconArrowRight } from "@tabler/icons-react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { IconBriefcase, IconPlus } from "@tabler/icons-react";
+import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetOrganizationsList } from "@/services/organizations/query";
+import { useGetProjects } from "@/services/projects/query";
 import { CreateProjectDialog } from "@/components/project/create-project-dialog";
 
 export const Route = createFileRoute("/_dashboard/projects/")({
@@ -21,8 +21,7 @@ export const Route = createFileRoute("/_dashboard/projects/")({
 
 function ProjectsIndexPage() {
   const { t } = useTranslation();
-  const { data: organizations, isLoading: isLoadingList } =
-    useGetOrganizationsList();
+  const { data: projects, isLoading: isLoadingList } = useGetProjects();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   return (
@@ -55,29 +54,29 @@ function ProjectsIndexPage() {
               </Card>
             ))}
           </>
-        ) : organizations && organizations.length > 0 ? (
+        ) : projects && projects.length > 0 ? (
           <>
-            {organizations.map((org) => (
-              <Link key={org.id} to="/projects/$id" params={{ id: org.id }}>
-                <Card className="cursor-pointer transition-all duration-200 group hover:border-primary hover:bg-primary/10">
-                  <CardHeader className="pb-4 *:group-hover:text-primary">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <IconBriefcase className="h-5 w-5" />
-                        <div>
-                          <CardTitle className="text-lg line-clamp-1 ">
-                            {org.name}
-                          </CardTitle>
-                          <CardDescription className="text-sm">
-                            {org.slug || "default project"}
-                          </CardDescription>
-                        </div>
-                      </div>
-                      <IconArrowRight className="h-5 w-5 text-muted-foreground group-hover:translate-x-1 transition-transform duration-200" />
+            {projects.map((project) => (
+              <Card key={project.id} className="transition-all duration-200">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-2">
+                    <IconBriefcase className="h-5 w-5 text-primary" />
+                    <div className="flex-1">
+                      <CardTitle className="text-lg line-clamp-1">
+                        {project.name}
+                      </CardTitle>
+                      <CardDescription className="text-sm font-mono">
+                        {project.id}
+                      </CardDescription>
                     </div>
-                  </CardHeader>
-                </Card>
-              </Link>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="text-xs text-muted-foreground">
+                    Created: {new Date(project.createdAt).toLocaleDateString()}
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </>
         ) : (

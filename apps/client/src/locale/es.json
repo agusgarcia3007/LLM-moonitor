@@ -157,6 +157,7 @@
     "loading": "Cargando",
     "cancel": "Cancelar",
     "save": "Guardar",
+    "saving": "Guardando",
     "delete": "Eliminar",
     "edit": "Editar",
     "create": "Crear",
@@ -229,6 +230,7 @@
   "navigation": {
     "dashboard": "Panel",
     "projects": "Proyectos",
+    "organization": "Organización",
     "logs": "Registros",
     "costAnalysis": "Análisis de Costos",
     "alerts": "Alertas",
@@ -532,10 +534,13 @@
     "title": "Proyectos",
     "description": "Gestiona tus proyectos y organiza tu monitoreo de IA",
     "createProject": "Crear Proyecto",
+    "editProject": "Editar Proyecto",
+    "projects": "Proyectos",
     "createFirstProject": "Crear tu primer proyecto",
     "noProjectsTitle": "Aún no tienes proyectos",
     "noProjectsDescription": "Crea tu primer proyecto para comenzar a organizar tu monitoreo de IA",
     "projectName": "Nombre del Proyecto",
+    "enterProjectName": "Ingresa el nombre del proyecto",
     "projectLogo": "Logo del Proyecto",
     "projectCreated": "Proyecto creado exitosamente",
     "projectUpdated": "Proyecto actualizado exitosamente",
@@ -628,8 +633,7 @@
     "email": "Correo Electrónico",
     "changeRole": "Cambiar Rol",
     "removeMember": "Eliminar Miembro",
-    "inviteMemberDescription": "Invita a un nuevo miembro a unirse a esta organización",
-    "description": "Descripción"
+    "inviteMemberDescription": "Invita a un nuevo miembro a unirse a esta organización"
   },
   "alertsNew": {
     "title": "Alertas",
@@ -686,7 +690,16 @@
     "copied": "Copiado al portapapeles",
     "empty_action": "No hay acciones disponibles",
     "copy_id": "Copiar ID",
-    "add_project": "Añadir Proyecto"
+    "add_project": "Añadir Proyecto",
+    "organizations": "Organizaciones",
+    "editAction": "Editar",
+    "deleteAction": "Eliminar",
+    "title": "Organización",
+    "description": "Gestiona la configuración y miembros de tu organización",
+    "members": "Miembros",
+    "membersDescription": "Ver y gestionar miembros de la organización",
+    "slug": "Slug",
+    "organizationInfo": "Información de la Organización"
   },
   "logs": {
     "title": "Registros",

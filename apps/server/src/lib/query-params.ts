@@ -112,15 +112,15 @@ export function parseEventFilters(c: Context): EventFilters {
 }
 
 export function buildEventWhereConditions({
-  organizationId,
+  projectId,
   apiKey,
   filters,
 }: {
-  organizationId: string;
+  projectId: string;
   apiKey?: string;
   filters: EventFilters;
 }) {
-  const whereConditions = [eq(llm_event.organization_id, organizationId)];
+  const whereConditions = [eq(llm_event.project_id, projectId)];
 
   if (apiKey) {
     whereConditions.push(sql`metadata->>'apiKey' = ${apiKey}`);

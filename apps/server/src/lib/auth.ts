@@ -3,13 +3,22 @@ import * as schema from "@/db/schema";
 import { stripe } from "@better-auth/stripe";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { admin, apiKey, organization } from "better-auth/plugins";
+import {
+  admin,
+  apiKey,
+  organization,
+  customSession,
+} from "better-auth/plugins";
 import { randomUUID } from "crypto";
 import { eq } from "drizzle-orm";
 import Stripe from "stripe";
 import { siteData, TRUSTED_ORIGINS } from "./constants";
 import { EmailService } from "./email-service";
-import { getActiveOrganization } from "./utils";
+import {
+  getActiveOrganization,
+  getActiveProject,
+  getActiveSubscription,
+} from "./utils";
 
 const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-06-30.basil",
@@ -101,6 +110,27 @@ export const auth = betterAuth({
         maxRequests: 100, // 100 solicitudes por ventana de tiempo
       },
     }),
+    customSession(async ({ user, session }) => {
+      const [organization, project, sub] = await Promise.all([
+        getActiveOrganization(session.userId),
+        getActiveProject(session.userId),
+        getActiveSubscription(session.userId),
+      ]);
+
+      return {
+        user,
+        session: {
+          ...session,
+          activeOrganizationId: organization?.id ?? null,
+          activeProjectId: project?.id ?? null,
+          subscriptionPlan: sub?.plan ?? null,
+          subscriptionStatus: sub?.status ?? null,
+          subscriptionPeriodEnd: sub?.periodEnd
+            ? sub.periodEnd.toISOString()
+            : null,
+        },
+      };
+    }),
     stripe({
       stripeClient,
       stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
@@ -161,22 +191,6 @@ export const auth = betterAuth({
   ],
 
   databaseHooks: {
-    session: {
-      create: {
-        before: async (session) => {
-          const [organization] = await Promise.all([
-            getActiveOrganization(session.userId),
-          ]);
-
-          return {
-            data: {
-              ...session,
-              activeOrganizationId: organization?.id ?? null,
-            },
-          };
-        },
-      },
-    },
     user: {
       create: {
         after: async (user, request) => {

@@ -30,6 +30,7 @@ export const user = pgTable("user", {
   banExpires: timestamp("ban_expires"),
   stripeCustomerId: text("stripe_customer_id"),
   lastActiveOrganizationId: text("last_active_organization_id"),
+  lastActiveProjectId: text("last_active_project_id"),
 });
 
 export const session = pgTable("session", {
@@ -44,6 +45,7 @@ export const session = pgTable("session", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   activeOrganizationId: text("active_organization_id"),
+  activeProjectId: text("active_project_id"),
   impersonatedBy: text("impersonated_by"),
 });
 
@@ -113,6 +115,24 @@ export const invitation = pgTable("invitation", {
     .references(() => user.id, { onDelete: "cascade" }),
 });
 
+export const project = pgTable("project", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  createdBy: text("created_by")
+    .notNull()
+    .references(() => user.id),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
 export type LLMEventMetadata = {
   apiKey?: string;
   [key: string]: unknown;
@@ -123,6 +143,9 @@ export const llm_event = pgTable("llm_event", {
   organization_id: text("organization_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
+  project_id: text("project_id").references(() => project.id, {
+    onDelete: "cascade",
+  }),
   session_id: text("session_id"),
   request_id: text("request_id"),
   provider: text("provider").notNull(),
@@ -235,6 +258,9 @@ export const apikey = pgTable("apikey", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  projectId: text("project_id").references(() => project.id, {
+    onDelete: "cascade",
+  }),
   refillInterval: integer("refill_interval"),
   refillAmount: integer("refill_amount"),
   lastRefillAt: timestamp("last_refill_at"),

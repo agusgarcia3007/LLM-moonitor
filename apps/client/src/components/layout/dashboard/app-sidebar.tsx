@@ -1,5 +1,6 @@
 import {
   IconBriefcase,
+  IconBuilding,
   IconCurrency,
   IconDashboard,
   IconFileDescription,
@@ -55,6 +56,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: t("navigation.projects"),
         url: "/projects",
         icon: IconBriefcase,
+      },
+      {
+        title: t("navigation.organization"),
+        url: "/organization",
+        icon: IconBuilding,
       },
       {
         title: t("navigation.logs"),

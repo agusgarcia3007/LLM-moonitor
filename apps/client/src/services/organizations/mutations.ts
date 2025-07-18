@@ -1,37 +1,42 @@
-import type { OrganizationParams } from "@/types/organizations";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { OrganizationService } from "./service";
+import type { OrganizationParams } from "@/types/organizations";
 
 export const useCreateOrganization = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (params: OrganizationParams) =>
       OrganizationService.createOrganization(params),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["organization"] });
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
+      queryClient.invalidateQueries({ queryKey: ["organization"] });
     },
   });
 };
 
 export const useUpdateOrganization = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: OrganizationService.updateOrganization,
+    mutationFn: (params: OrganizationParams) =>
+      OrganizationService.updateOrganization(params),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["organization"] });
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
+      queryClient.invalidateQueries({ queryKey: ["organization"] });
     },
   });
 };
 
 export const useDeleteOrganization = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: OrganizationService.deleteOrganization,
+    mutationFn: (organizationId: string) =>
+      OrganizationService.deleteOrganization(organizationId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["organization"] });
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
+      queryClient.invalidateQueries({ queryKey: ["organization"] });
     },
   });
 };
@@ -50,6 +55,7 @@ export const useSetActiveOrganization = () => {
       queryClient.invalidateQueries({ queryKey: ["organization"] });
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
       queryClient.invalidateQueries({ queryKey: ["activeMember"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["llm-events"], exact: false });
       queryClient.invalidateQueries({
         queryKey: ["dashboard-stats"],
@@ -71,6 +77,7 @@ export const useSetActiveOrganizationBySlug = () => {
       queryClient.invalidateQueries({ queryKey: ["organization"] });
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
       queryClient.invalidateQueries({ queryKey: ["activeMember"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["llm-events"], exact: false });
       queryClient.invalidateQueries({
         queryKey: ["dashboard-stats"],
@@ -86,14 +93,10 @@ export const useSetActiveOrganizationBySlug = () => {
 
 export const useInviteMember = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (params: {
-      email: string;
-      role: "member" | "admin" | "owner";
-      organizationId?: string;
-    }) => OrganizationService.inviteMember(params),
+    mutationFn: OrganizationService.inviteMember,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invitations"] });
       queryClient.invalidateQueries({ queryKey: ["organization"] });
     },
   });
@@ -146,11 +149,10 @@ export const useUpdateMemberRole = () => {
 
 export const useCancelInvitation = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (invitationId: string) =>
-      OrganizationService.cancelInvitation(invitationId),
+    mutationFn: OrganizationService.cancelInvitation,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invitations"] });
       queryClient.invalidateQueries({ queryKey: ["organization"] });
     },
   });
