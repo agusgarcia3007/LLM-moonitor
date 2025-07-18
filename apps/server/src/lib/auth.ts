@@ -138,7 +138,7 @@ export const auth = betterAuth({
 
       subscription: {
         enabled: true,
-
+        organization: { enabled: true },
         plans: [
           {
             name: "pro-lite",
@@ -178,7 +178,13 @@ export const auth = betterAuth({
           },
           // Enterprise is "contact-sales", so no priceId here
         ],
-
+        getCheckoutSessionParams: async () => {
+          return {
+            params: {
+              allow_promotion_codes: true,
+            },
+          };
+        },
         onSubscriptionComplete: async ({ stripeSubscription }) => {
           await stripeClient.subscriptionItems.create({
             subscription: stripeSubscription.id,
