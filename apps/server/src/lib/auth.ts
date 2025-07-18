@@ -189,7 +189,6 @@ export const auth = betterAuth({
           await stripeClient.subscriptionItems.create({
             subscription: stripeSubscription.id,
             price: "price_1Rjl2dBvY3hUsoTtgGFrUViN", // add-on metered (0.00002 USD/event)
-            quantity: 0, // evita enviar "quantity: 1"
           });
         },
       },
