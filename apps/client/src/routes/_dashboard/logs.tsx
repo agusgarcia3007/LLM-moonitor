@@ -138,15 +138,6 @@ export function LogsPage() {
   const columns = useMemo<ColumnDef<LLMEvent>[]>(
     () => [
       {
-        accessorKey: "id",
-        header: createSortableHeader(t("logsTable.id")),
-        cell: ({ row }) => (
-          <div className="font-medium" title={row.getValue("id")}>
-            {row.getValue("id")}
-          </div>
-        ),
-      },
-      {
         accessorKey: "model",
         header: createSortableHeader(t("logsTable.model")),
         cell: ({ row }) => (
@@ -304,6 +295,15 @@ export function LogsPage() {
             </div>
           );
         },
+      },
+      {
+        accessorKey: "id",
+        header: createSortableHeader(t("logsTable.id")),
+        cell: ({ row }) => (
+          <div className="font-medium" title={row.getValue("id")}>
+            {row.getValue("id")}
+          </div>
+        ),
       },
       {
         accessorKey: "metadata",
