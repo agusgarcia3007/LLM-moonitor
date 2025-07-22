@@ -9,7 +9,8 @@ export const AI_PROVIDERS: ProviderConfig = {
   anthropic: {
     name: "anthropic",
     displayName: "Anthropic",
-    pricingUrl: "https://www.anthropic.com/pricing#api",
+    pricingUrl:
+      "https://docs.anthropic.com/en/docs/about-claude/models/overview#model-pricing",
   },
   google: {
     name: "google",
